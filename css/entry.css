@@ -1,0 +1,95 @@
+/* ============================================
+   REEL — Entry modal
+   ============================================ */
+
+.entry-body {
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.entry-hint {
+  font-size: var(--fs-small);
+  color: var(--text-dim-2);
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: var(--sp-3);
+}
+
+.entry-textarea {
+  width: 100%;
+  min-height: 130px;
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--r-sm);
+  padding: var(--sp-3) var(--sp-4);
+  font-family: var(--font);
+  font-size: var(--fs-body);
+  font-weight: 600;
+  color: var(--text);
+  resize: none;
+  line-height: 1.6;
+  transition: border-color var(--t-fast);
+}
+.entry-textarea::placeholder { color: var(--text-dim-2); }
+.entry-textarea:focus { outline: none; border-color: var(--amber); }
+
+.entry-footer {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-5) calc(var(--sp-5) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border-ghost);
+}
+
+.btn-entry-cancel {
+  flex: 0 0 auto;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-subtle);
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: var(--font);
+  font-size: var(--fs-small);
+  font-weight: 800;
+  color: var(--text-dim-2);
+  transition: all var(--t-fast);
+}
+.btn-entry-cancel:hover { color: var(--text); }
+
+.btn-entry-submit {
+  flex: 1;
+  padding: var(--sp-3) 0;
+  background: var(--amber);
+  border: none;
+  border-radius: var(--r-pill);
+  font-family: var(--font);
+  font-size: var(--fs-small);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bg);
+  transition: all var(--t-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+}
+.btn-entry-submit:hover { opacity: 0.88; }
+.btn-entry-submit:disabled { opacity: 0.5; cursor: default; }
+
+/* ---- Loading card (ottimistica dopo submit) ---- */
+.entry-loading-card {
+  background: var(--bg-card);
+  border: 1px solid var(--amber-border);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4) var(--sp-5);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  margin: 0 var(--sp-4);
+  animation: fadeIn var(--t-med);
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.entry-loading-text {
+  font-size: var(--fs-small);
+  font-weight: 700;
+  color: var(--text-dim);
+}

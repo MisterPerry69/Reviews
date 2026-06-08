@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#12100e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Reel</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/list.css" />
+  <link rel="stylesheet" href="css/detail.css" />
+  <link rel="stylesheet" href="css/entry.css" />
+  <link rel="stylesheet" href="css/stats.css" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============================================ -->
+  <!-- HEADER                                       -->
+  <!-- ============================================ -->
+  <header class="app-header">
+    <div class="app-title">Reel</div>
+    <div class="header-actions">
+      <button class="icon-btn" id="btn-entry" aria-label="Nuova recensione">
+        <i data-lucide="plus"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============================================ -->
+  <!-- SEARCH                                       -->
+  <!-- ============================================ -->
+  <div class="search-wrap">
+    <div class="search-icon"><i data-lucide="search"></i></div>
+    <input
+      type="text"
+      id="search-input"
+      class="search-input"
+      placeholder="Cerca titolo, commento..."
+      autocomplete="off"
+    />
+    <button class="search-clear hidden" id="search-clear" aria-label="Cancella ricerca">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- FILTER CHIPS                                 -->
+  <!-- ============================================ -->
+  <div class="filter-row" id="filter-row">
+    <button class="filter-chip active" onclick="setCategory('ALL', this)">Tutti</button>
+    <button class="filter-chip" onclick="setCategory('FILM', this)">🎬 Film</button>
+    <button class="filter-chip" onclick="setCategory('SERIE', this)">📺 Serie</button>
+    <button class="filter-chip" onclick="setCategory('GAME', this)">🎮 Game</button>
+    <button class="filter-chip" onclick="setCategory('COMIC', this)">📚 Fumetti</button>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- VIEW TOGGLE                                  -->
+  <!-- ============================================ -->
+  <div class="view-toggle-row">
+    <button class="view-chip active" id="view-reviews"  onclick="setView('reviews')">Reviews</button>
+    <button class="view-chip"        id="view-wishlist" onclick="setView('wishlist')">Wishlist</button>
+    <button class="view-chip"        id="view-progress" onclick="setView('progress')">In corso</button>
+    <button class="view-chip"        id="view-stats"    onclick="setView('stats')">Stats</button>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- CONTENT                                      -->
+  <!-- ============================================ -->
+  <div class="content-scroll">
+
+    <!-- Lista review -->
+    <div id="list-wrap">
+      <div id="reviews-list" class="reviews-list"></div>
+    </div>
+
+    <!-- Stats view -->
+    <div id="stats-view" class="stats-view hidden">
+      <!-- Hero contatori -->
+      <div class="stats-hero">
+        <div class="stats-hero-item">
+          <div class="stats-hero-num" id="stats-total">0</div>
+          <div class="stats-hero-label">Totale</div>
+        </div>
+        <div class="stats-hero-item">
+          <div class="stats-hero-num" id="stats-avg">—</div>
+          <div class="stats-hero-label">Rating medio</div>
+        </div>
+        <div class="stats-hero-item">
+          <div class="stats-hero-num" id="stats-wishlist">0</div>
+          <div class="stats-hero-label">Wishlist</div>
+        </div>
+        <div class="stats-hero-item">
+          <div class="stats-hero-num" id="stats-progress">0</div>
+          <div class="stats-hero-label">In corso</div>
+        </div>
+      </div>
+
+      <!-- Per categoria -->
+      <div class="card">
+        <div class="section-heading">Per categoria</div>
+        <div id="stats-cat-list"></div>
+      </div>
+
+      <!-- Top 5 -->
+      <div class="card">
+        <div class="section-heading">Top 5</div>
+        <div id="stats-top-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- #app -->
+
+
+<!-- ============================================ -->
+<!-- DETAIL MODAL                                 -->
+<!-- ============================================ -->
+<div id="detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="detail-hero">
+      <img id="detail-hero-img" class="detail-hero-img hidden" src="" alt="" />
+      <div id="detail-hero-placeholder" class="detail-hero-placeholder hidden"></div>
+      <div class="detail-hero-gradient"></div>
+      <button class="detail-close-btn" id="detail-close-btn" aria-label="Chiudi">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <div class="detail-body">
+      <div class="detail-title" id="detail-title"></div>
+
+      <div class="detail-meta-row">
+        <span class="cat-badge" id="detail-cat-badge"></span>
+        <span class="detail-rating" id="detail-rating"></span>
+        <span class="detail-metadata" id="detail-metadata"></span>
+        <span class="detail-date review-date" id="detail-date"></span>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-section-label">Recensione</div>
+        <div class="detail-commento" id="detail-commento"></div>
+      </div>
+
+      <div id="detail-pros-cons-wrap" class="detail-section">
+        <div class="detail-pros-cons">
+          <div class="detail-pros" id="detail-pros-section">
+            <div class="detail-pc-label">Pro</div>
+            <ul class="detail-pc-list" id="detail-pros-list"></ul>
+          </div>
+          <div class="detail-cons" id="detail-cons-section">
+            <div class="detail-pc-label">Contro</div>
+            <ul class="detail-pc-list" id="detail-cons-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-promote hidden" id="detail-promote-btn">Promuovi a Recensione</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================ -->
+<!-- ENTRY MODAL                                  -->
+<!-- ============================================ -->
+<div id="entry-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Nuova voce</div>
+      <button class="icon-btn modal-close" id="entry-close-btn" aria-label="Chiudi">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <div class="entry-body">
+      <p class="entry-hint">
+        Scrivi in modo naturale: l'AI estrae titolo, categoria, rating e rielabora il tuo commento.<br>
+        Es: "Ho visto Dune parte 2, spettacolo visivo pazzesco, 4.5/5 — storia un po' lunga"
+      </p>
+      <textarea
+        id="entry-textarea"
+        class="entry-textarea"
+        placeholder="Scrivi qui la tua recensione..."
+        rows="6"
+      ></textarea>
+    </div>
+
+    <div class="entry-footer">
+      <button class="btn-entry-cancel" id="entry-cancel-btn">Annulla</button>
+      <button class="btn-entry-submit" id="entry-submit-btn">
+        <i data-lucide="sparkles"></i>
+        Pubblica
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/list.js"></script>
+<script src="js/detail.js"></script>
+<script src="js/entry.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    lucide.createIcons();
+    document.getElementById("btn-entry").addEventListener("click", () => openEntry());
+  });
+</script>
+</body>
+</html>

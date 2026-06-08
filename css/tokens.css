@@ -1,0 +1,76 @@
+/* ============================================
+   REEL — Design tokens
+   Palette: ambra/cinema, dark
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ---- Palette base dark ---- */
+  --bg:           #12100e;
+  --bg-card:      #1c1914;
+  --bg-subtle:    #252018;
+
+  /* ---- Ambra / oro ---- */
+  --amber:        #f59e0b;
+  --amber-light:  #fcd34d;
+  --amber-pale:   #fef3c7;
+  --amber-dim:    rgba(245,158,11,0.12);
+  --amber-border: rgba(245,158,11,0.28);
+
+  /* ---- Mogano / marrone scuro ---- */
+  --mahogany:     #7c3a1e;
+  --mahogany-dim: rgba(124,58,30,0.10);
+
+  /* ---- Rosso cinematografico ---- */
+  --crimson:      #dc2626;
+  --crimson-dim:  rgba(220,38,38,0.10);
+
+  /* Accent corrente */
+  --accent: #f59e0b;
+
+  /* ---- Testo ---- */
+  --text:         #f5f0e8;
+  --text-dim:     #b8a88a;
+  --text-dim-2:   #7a6b52;
+  --text-on-dark: rgba(255,255,255,0.92);
+
+  /* ---- Borders ---- */
+  --border-ghost: rgba(245,158,11,0.08);
+  --border-soft:  rgba(245,158,11,0.14);
+  --border:       rgba(245,158,11,0.22);
+
+  /* ---- Semantici ---- */
+  --color-positive: #22c55e;
+  --color-negative: #ef4444;
+  --star-color:     #f59e0b;
+
+  /* ---- Tipografia ---- */
+  --font:      'Nunito', system-ui, sans-serif;
+  --font-mono: 'Nunito Sans', monospace;
+
+  --fs-micro:   0.62rem;
+  --fs-small:   0.76rem;
+  --fs-body:    0.9rem;
+  --fs-title:   1.05rem;
+  --fs-display: 1.7rem;
+  --fs-hero:    3rem;
+
+  /* ---- Spacing ---- */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px;
+
+  /* ---- Radii ---- */
+  --r-xs: 6px; --r-sm: 10px; --r: 14px;
+  --r-lg: 20px; --r-xl: 28px; --r-pill: 999px;
+
+  /* ---- Shadows ---- */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+  --shadow:    0 4px 12px rgba(0,0,0,0.35), 0 1px 3px rgba(0,0,0,0.2);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.45), 0 4px 8px rgba(0,0,0,0.25);
+
+  /* ---- Transitions ---- */
+  --t-fast: 0.14s ease;
+  --t-med:  0.24s ease;
+  --t-slow: 0.4s ease;
+}
