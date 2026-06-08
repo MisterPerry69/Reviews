@@ -2,7 +2,7 @@
    REEL — API layer
    ============================================ */
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxLmfIqVI0KxAu3WrAAToh_Bx_3v32FhHKf2NAbpmkYTkhvnFTP89uMBz4yTtOpMTvgCA/exec"; // sostituire dopo deploy GAS
+const GAS_URL = "YOUR_GAS_URL_HERE"; // sostituire dopo deploy GAS
 
 async function _parse(res) {
   const txt = await res.text();

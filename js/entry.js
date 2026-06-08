@@ -50,7 +50,7 @@ async function submitEntry() {
         titolo:    r.titolo    || "",
         categoria: r.categoria || "ALTRO",
         rating:    r.rating    || 0,
-        commento:  r.commento_full_rewrite || "",
+        commento:  r.commento || "",
         image_url: r.image_url || "",
         riassunto: r.commento_breve || "",
         metadata:  r.metadata  || "",

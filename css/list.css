@@ -1,10 +1,10 @@
 /* ============================================
-   REEL — Review list & filters
+   REEL — List view
    ============================================ */
 
 /* ---- Search bar ---- */
 .search-wrap {
-  padding: var(--sp-2) var(--sp-4) var(--sp-3);
+  padding: var(--sp-3) var(--sp-4) var(--sp-2);
   position: relative;
   flex-shrink: 0;
 }
@@ -29,8 +29,10 @@
   transform: translateY(-50%);
   color: var(--text-dim-2);
   pointer-events: none;
+  display: grid;
+  place-items: center;
 }
-.search-icon svg { width: 16px; height: 16px; stroke-width: 2; }
+.search-icon svg { width: 15px; height: 15px; stroke-width: 2; }
 .search-clear {
   position: absolute;
   right: calc(var(--sp-4) + 8px);
@@ -45,50 +47,18 @@
 }
 .search-clear svg { width: 14px; height: 14px; }
 
-/* ---- Filter chips ---- */
-.filter-row {
+/* ---- Filtri (tipo voce + categoria) ---- */
+.list-filters {
   display: flex;
-  gap: var(--sp-2);
-  padding: 0 var(--sp-4) var(--sp-3);
-  overflow-x: auto;
-  scrollbar-width: none;
-  flex-shrink: 0;
-}
-.filter-row::-webkit-scrollbar { display: none; }
-
-.filter-chip {
-  flex-shrink: 0;
-  padding: 6px 14px;
-  border-radius: var(--r-pill);
-  font-size: var(--fs-micro);
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  background: var(--bg-subtle);
-  border: 1.5px solid var(--border-soft);
-  color: var(--text-dim-2);
-  transition: all var(--t-fast);
-  cursor: pointer;
-}
-.filter-chip.active {
-  background: var(--amber-dim);
-  border-color: var(--amber-border);
-  color: var(--amber);
-}
-.filter-chip:hover:not(.active) {
-  border-color: var(--amber-border);
-  color: var(--text-dim);
-}
-
-/* ---- View toggle chips ---- */
-.view-toggle-row {
-  display: flex;
+  align-items: center;
   gap: var(--sp-2);
   padding: 0 var(--sp-4) var(--sp-3);
   flex-shrink: 0;
 }
-.view-chip {
-  padding: 5px 12px;
+
+/* Chips Tutte / Wishlist / In corso */
+.type-chip {
+  padding: 6px 11px;
   border-radius: var(--r-pill);
   font-size: var(--fs-micro);
   font-weight: 800;
@@ -99,20 +69,46 @@
   color: var(--text-dim-2);
   transition: all var(--t-fast);
   cursor: pointer;
+  white-space: nowrap;
 }
-.view-chip.active {
-  background: var(--bg-card);
+.type-chip.active {
+  background: var(--amber-dim);
   border-color: var(--amber-border);
   color: var(--amber);
-  box-shadow: var(--shadow-sm);
 }
+.type-chip:hover:not(.active) { border-color: var(--amber-border); color: var(--text-dim); }
+
+/* Select categoria */
+.cat-select {
+  flex: 1;
+  min-width: 0;
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-soft);
+  border-radius: var(--r-pill);
+  color: var(--text-dim);
+  font-family: var(--font);
+  font-size: var(--fs-micro);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%237a6b52' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  transition: border-color var(--t-fast);
+  cursor: pointer;
+}
+.cat-select:focus { outline: none; border-color: var(--amber); color: var(--text); }
+.cat-select option { background: var(--bg-card); color: var(--text); }
 
 /* ---- Review cards list ---- */
 .reviews-list {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  padding: 0 var(--sp-4) 120px;
+  padding: 0 var(--sp-4) 20px;
 }
 
 .review-card {
@@ -150,7 +146,7 @@
 
 .review-info {
   flex: 1;
-  padding: var(--sp-3) var(--sp-3) var(--sp-3) var(--sp-3);
+  padding: var(--sp-3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -175,10 +171,7 @@
   min-width: 0;
 }
 
-.review-rating {
-  font-size: 10px;
-  flex-shrink: 0;
-}
+.review-rating { font-size: 10px; flex-shrink: 0; }
 
 .review-snippet {
   font-size: var(--fs-micro);
@@ -202,7 +195,7 @@
   font-weight: 600;
 }
 
-/* ---- Wish / in-progress indicator on card ---- */
+/* ---- Wish / in-progress badge sul poster ---- */
 .review-poster-badge {
   position: absolute;
   top: 4px;
@@ -214,8 +207,8 @@
   padding: 2px 5px;
   border-radius: var(--r-xs);
 }
-.review-poster-badge.wish { background: rgba(168,85,247,0.85); color: #fff; }
-.review-poster-badge.progress { background: rgba(34,197,94,0.85); color: #fff; }
+.review-poster-badge.wish     { background: rgba(168,85,247,0.85); color: #fff; }
+.review-poster-badge.progress { background: rgba(34,197,94,0.85);  color: #fff; }
 
 /* ---- Loading skeleton ---- */
 .skeleton-card {
