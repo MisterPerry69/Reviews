@@ -1,15 +1,13 @@
 /* ============================================
-   REEL — List view: cards, filtri, search
+   rank★d — List view: render + filtri
    ============================================ */
 
-let _allReviews   = [];
-let _currentType  = "reviews"; // "reviews" | "wishlist" | "progress"
-let _currentCat   = "ALL";
-let _searchQuery  = "";
+let _allReviews = [];
+let _searchQuery = "";
 
-window._allReviewsCache = _allReviews; // riferimento per stats
+window._allReviewsCache = _allReviews;
 
-// ---- Caricamento ----
+/* ---- Caricamento ---- */
 
 async function loadAllReviews() {
   _showSkeletons();
@@ -30,18 +28,21 @@ function _showSkeletons() {
     Array.from({ length: 5 }).map(() => '<div class="skeleton-card"></div>').join("");
 }
 
-// ---- Render ----
+function refreshReviews() { loadAllReviews(); }
+
+/* ---- Render ---- */
 
 function _render() {
+  const state = typeof _currentState !== "undefined" ? _currentState : "reviews";
+  const cat   = typeof _currentCat   !== "undefined" ? _currentCat   : "ALL";
+
   let items = _allReviews;
 
-  if (_currentType === "wishlist")  items = items.filter(isWish);
-  if (_currentType === "progress")  items = items.filter(isProgress);
-  if (_currentType === "reviews")   items = items.filter(r => !isWish(r) && !isProgress(r));
+  if (state === "wishlist")  items = items.filter(isWish);
+  else if (state === "progress") items = items.filter(isProgress);
+  else items = items.filter(r => !isWish(r) && !isProgress(r));
 
-  if (_currentCat !== "ALL") {
-    items = items.filter(r => getCleanCat(r) === _currentCat);
-  }
+  if (cat !== "ALL") items = items.filter(r => getCleanCat(r) === cat);
 
   if (_searchQuery) {
     const q = _searchQuery.toLowerCase();
@@ -55,7 +56,7 @@ function _render() {
 
   const list = document.getElementById("reviews-list");
   if (items.length === 0) {
-    list.innerHTML = '<div class="empty-state">Nessuna recensione trovata</div>';
+    list.innerHTML = '<div class="empty-state">Nessuna voce trovata</div>';
     return;
   }
   list.innerHTML = items.map(_renderCard).join("");
@@ -68,6 +69,7 @@ function _renderCard(r) {
   const emoji    = CAT_EMOJI[cat] || "🎭";
   const wish     = isWish(r);
   const progress = isProgress(r);
+
   const posterStyle = r.image_url
     ? `background-image: url('${escapeHtml(r.image_url)}')`
     : "";
@@ -77,8 +79,11 @@ function _renderCard(r) {
     ? '<span class="review-poster-badge progress">In corso</span>'
     : "";
 
+  const stateLabel = wish ? "Wish" : progress ? "In corso" : cat;
+  const catBgClass = `cat-${cat.toLowerCase()}`;
+
   return `
-    <div class="review-card" data-id="${escapeHtml(r.id)}">
+    <div class="review-card" data-id="${escapeHtml(r.id)}" data-cat="${escapeHtml(cat)}">
       <div class="review-poster" style="${posterStyle}">
         ${r.image_url ? "" : `<div class="review-poster-placeholder">${emoji}</div>`}
         ${badge}
@@ -92,7 +97,7 @@ function _renderCard(r) {
         </div>
         <div class="review-snippet">${escapeHtml(r.riassunto || r.commento)}</div>
         <div class="review-meta-row">
-          <span class="cat-badge${wish ? " wish" : progress ? " progress" : ""}">${escapeHtml(cat)}</span>
+          <span class="cat-badge">${escapeHtml(stateLabel)}</span>
           <span class="review-date">${formatDate(r.data)}</span>
         </div>
       </div>
@@ -109,43 +114,8 @@ function _bindCardClicks() {
   });
 }
 
-// ---- Filtro tipo (Tutte / Wishlist / In corso) ----
-
-function setType(type, el) {
-  _currentType = type;
-  document.querySelectorAll(".type-chip").forEach(c => c.classList.remove("active"));
-  el.classList.add("active");
-  _render();
-}
-
-// ---- Filtro categoria (select) ----
-
-function refreshReviews() {
-  loadAllReviews();
-}
+/* ---- DOMContentLoaded ---- */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Search
-  const input    = document.getElementById("search-input");
-  const clearBtn = document.getElementById("search-clear");
-
-  input.addEventListener("input", () => {
-    _searchQuery = input.value.trim();
-    clearBtn.classList.toggle("hidden", !_searchQuery);
-    _render();
-  });
-
-  clearBtn.addEventListener("click", () => {
-    input.value  = "";
-    _searchQuery = "";
-    clearBtn.classList.add("hidden");
-    _render();
-  });
-
-  // Categoria select
-  const catSelect = document.getElementById("cat-select");
-  catSelect.addEventListener("change", () => {
-    _currentCat = catSelect.value || "ALL";
-    _render();
-  });
+  // Nessun search input nell'HTML nuovo — niente da bindare qui
 });

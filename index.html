@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#12100e" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Reviews</title>
+  <title>rank★d</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/base.css" />
@@ -18,102 +17,82 @@
 </head>
 <body>
 
-  <!-- ============================================ -->
-  <!-- SPLASH                                       -->
-  <!-- ============================================ -->
+  <!-- SPLASH -->
   <div id="splash" class="splash">
-    <div class="splash-icon">
-      <!-- Pellicola SVG — placeholder fino a scelta nome definitivo -->
-      <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-        <!-- Corpo pellicola -->
-        <rect x="4"  y="14" width="48" height="28" rx="4" fill="#f59e0b"/>
-        <!-- Fori sinistra -->
-        <rect x="4"  y="16" width="7" height="5" rx="1.5" fill="#1a1508"/>
-        <rect x="4"  y="25" width="7" height="5" rx="1.5" fill="#1a1508"/>
-        <rect x="4"  y="34" width="7" height="5" rx="1.5" fill="#1a1508"/>
-        <!-- Fori destra -->
-        <rect x="45" y="16" width="7" height="5" rx="1.5" fill="#1a1508"/>
-        <rect x="45" y="25" width="7" height="5" rx="1.5" fill="#1a1508"/>
-        <rect x="45" y="34" width="7" height="5" rx="1.5" fill="#1a1508"/>
-        <!-- Stella centrale -->
-        <polygon points="28,20 29.8,25.5 35.5,25.5 31,29 32.8,34.5 28,31 23.2,34.5 25,29 20.5,25.5 26.2,25.5" fill="#1a1508" opacity="0.7"/>
-      </svg>
-    </div>
-    <div class="splash-name">Reviews</div>
-    <div class="splash-tagline">Tutto quello che hai visto</div>
+    <img class="splash-logo" src="logo.svg" alt="rank★d" />
     <div class="splash-bar-wrap">
       <div class="splash-bar" id="splash-bar"></div>
     </div>
   </div>
 
-  <!-- ============================================ -->
-  <!-- APP SHELL                                    -->
-  <!-- ============================================ -->
+  <!-- APP SHELL -->
   <div id="app" class="hidden">
 
-    <!-- TOP BAR -->
-    <div class="top-bar">
-      <button class="section-tab" id="tab-lista" onclick="setTab('lista')">
-        <div class="section-tab-bar"></div>
-        <span class="section-tab-label">Lista</span>
-      </button>
-
-      <button class="section-tab tab-center" id="tab-center" tabindex="-1">
-        <div class="section-tab-bar"></div>
-        <span class="section-tab-label">★</span>
-      </button>
-
-      <button class="section-tab" id="tab-stats" onclick="setTab('stats')">
-        <div class="section-tab-bar"></div>
-        <span class="section-tab-label">Stats</span>
-      </button>
-    </div>
-
-    <!-- ========================================== -->
-    <!-- LISTA VIEW                                 -->
-    <!-- ========================================== -->
-    <div id="list-view" class="content-scroll">
-
-      <!-- Search -->
-      <div class="search-wrap">
-        <div class="search-icon"><i data-lucide="search"></i></div>
-        <input
-          type="text"
-          id="search-input"
-          class="search-input"
-          placeholder="Cerca titolo, commento..."
-          autocomplete="off"
-        />
-        <button class="search-clear hidden" id="search-clear" aria-label="Cancella">
-          <i data-lucide="x"></i>
+    <!-- HEADER -->
+    <header class="app-header">
+      <img class="header-logo" src="logo.svg" alt="rank★d" />
+      <div class="header-actions">
+        <button class="header-icon-btn active-state-btn" id="state-progress" data-state="progress" aria-label="In corso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+            <circle cx="12" cy="12" r="9" stroke-dasharray="28 56" stroke-dashoffset="-14"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </button>
+        <button class="header-icon-btn" id="state-wishlist" data-state="wishlist" aria-label="Wishlist">
+          <i data-lucide="bookmark"></i>
+        </button>
+        <button class="header-icon-btn" id="state-stats" data-state="stats" aria-label="Statistiche">
+          <i data-lucide="bar-chart-2"></i>
         </button>
       </div>
+    </header>
 
-      <!-- Filtri: tipo voce + categoria -->
-      <div class="list-filters">
-        <button class="type-chip active" onclick="setType('reviews', this)">Tutte</button>
-        <button class="type-chip" onclick="setType('wishlist', this)">Wishlist</button>
-        <button class="type-chip" onclick="setType('progress', this)">In corso</button>
-        <select id="cat-select" class="cat-select">
-          <option value="ALL">Categoria</option>
-          <option value="FILM">🎬 Film</option>
-          <option value="SERIE">📺 Serie</option>
-          <option value="GAME">🎮 Game</option>
-          <option value="COMIC">📚 Fumetti</option>
-        </select>
-      </div>
+    <!-- CATEGORY TABS -->
+    <nav class="cat-tabs">
+      <button class="cat-tab active" data-cat="ALL">
+        <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+        </svg>
+      </button>
+      <button class="cat-tab" data-cat="FILM">
+        <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="7" y1="5" x2="7" y2="19"/><line x1="17" y1="5" x2="17" y2="19"/>
+          <line x1="2" y1="10" x2="7" y2="10"/><line x1="17" y1="10" x2="22" y2="10"/>
+          <line x1="2" y1="15" x2="7" y2="15"/><line x1="17" y1="15" x2="22" y2="15"/>
+        </svg>
+      </button>
+      <button class="cat-tab" data-cat="SERIE">
+        <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="14" rx="2"/>
+          <line x1="8" y1="22" x2="16" y2="22"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+        </svg>
+      </button>
+      <button class="cat-tab" data-cat="GAME">
+        <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/>
+          <circle cx="15.5" cy="11.5" r="0.5" fill="currentColor"/><circle cx="17.5" cy="13.5" r="0.5" fill="currentColor"/>
+          <path d="M17 4H7C4.24 4 2 6.24 2 9v5c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V9c0-2.76-2.24-5-5-5z"/>
+        </svg>
+      </button>
+      <button class="cat-tab" data-cat="COMIC">
+        <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </button>
+    </nav>
 
-      <!-- Cards -->
+    <!-- LIST AREA (colorato dal genere) -->
+    <div id="list-area" class="list-area">
       <div id="reviews-list" class="reviews-list"></div>
-
     </div>
 
-    <!-- ========================================== -->
-    <!-- STATS VIEW                                 -->
-    <!-- ========================================== -->
-    <div id="stats-view" class="content-scroll hidden">
-      <div class="stats-view">
-
+    <!-- STATS VIEW (separata) -->
+    <div id="stats-view" class="stats-view hidden">
+      <div class="stats-scroll">
         <div class="stats-hero">
           <div class="stats-hero-item">
             <div class="stats-hero-num" id="stats-total">0</div>
@@ -121,7 +100,7 @@
           </div>
           <div class="stats-hero-item">
             <div class="stats-hero-num" id="stats-avg">—</div>
-            <div class="stats-hero-label">Rating medio</div>
+            <div class="stats-hero-label">Media</div>
           </div>
           <div class="stats-hero-item">
             <div class="stats-hero-num" id="stats-wishlist">0</div>
@@ -132,34 +111,28 @@
             <div class="stats-hero-label">In corso</div>
           </div>
         </div>
-
-        <div class="card">
-          <div class="section-heading">Per categoria</div>
+        <div class="stats-card">
+          <div class="stats-section-label">Per categoria</div>
           <div id="stats-cat-list"></div>
         </div>
-
-        <div class="card">
-          <div class="section-heading">Top 5</div>
+        <div class="stats-card">
+          <div class="stats-section-label">Top 5</div>
           <div id="stats-top-list"></div>
         </div>
-
       </div>
     </div>
 
-    <!-- BOTTOM ACTION -->
-    <div class="bottom-action">
-      <button class="btn-new-entry" id="btn-entry">
+    <!-- BOTTOM BAR — solo FAB -->
+    <div class="bottom-bar">
+      <button class="fab" id="fab-new" aria-label="Nuova voce">
         <i data-lucide="plus"></i>
-        Nuova voce
       </button>
     </div>
 
   </div><!-- #app -->
 
 
-  <!-- ============================================ -->
-  <!-- DETAIL MODAL                                 -->
-  <!-- ============================================ -->
+  <!-- DETAIL MODAL -->
   <div id="detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="detail-hero">
@@ -170,23 +143,19 @@
           <i data-lucide="x"></i>
         </button>
       </div>
-
       <div class="detail-body">
         <div class="detail-title" id="detail-title"></div>
-
         <div class="detail-meta-row">
           <span class="cat-badge" id="detail-cat-badge"></span>
           <span class="detail-rating" id="detail-rating"></span>
           <span class="detail-metadata" id="detail-metadata"></span>
-          <span class="detail-date review-date" id="detail-date"></span>
+          <span class="detail-date" id="detail-date"></span>
         </div>
-
         <div class="detail-section">
           <div class="detail-section-label">Recensione</div>
           <div class="detail-commento" id="detail-commento"></div>
         </div>
-
-        <div id="detail-pros-cons-wrap" class="detail-section">
+        <div id="detail-pros-cons-wrap" class="detail-section hidden">
           <div class="detail-pros-cons">
             <div class="detail-pros" id="detail-pros-section">
               <div class="detail-pc-label">Pro</div>
@@ -198,16 +167,12 @@
             </div>
           </div>
         </div>
-
         <button class="btn-promote hidden" id="detail-promote-btn">Promuovi a Recensione</button>
       </div>
     </div>
   </div>
 
-
-  <!-- ============================================ -->
-  <!-- ENTRY MODAL                                  -->
-  <!-- ============================================ -->
+  <!-- ENTRY MODAL -->
   <div id="entry-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-header">
@@ -216,10 +181,9 @@
           <i data-lucide="x"></i>
         </button>
       </div>
-
       <div class="entry-body">
         <p class="entry-hint">
-          Scrivi in modo naturale — l'AI estrae titolo, categoria e rating senza rielaborare il tuo testo.<br>
+          Scrivi in modo naturale — l'AI sistema la forma mantenendo il tuo tono.<br>
           Es: "Dune parte 2, visivamente pazzesco, storia un po' lunga però. 4/5"
         </p>
         <textarea
@@ -229,7 +193,6 @@
           rows="5"
         ></textarea>
       </div>
-
       <div class="entry-footer">
         <button class="btn-entry-cancel" id="entry-cancel-btn">Annulla</button>
         <button class="btn-entry-submit" id="entry-submit-btn">
@@ -247,12 +210,5 @@
   <script src="js/list.js"></script>
   <script src="js/detail.js"></script>
   <script src="js/entry.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("btn-entry").addEventListener("click", () => openEntry());
-      // Tab lista attivo di default
-      document.getElementById("tab-lista").classList.add("active");
-    });
-  </script>
 </body>
 </html>

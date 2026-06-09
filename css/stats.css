@@ -1,54 +1,13 @@
 /* ============================================
-   REEL — Stats view
+   rank★d — Stats
    ============================================ */
 
-.stats-view {
-  padding: var(--sp-4) var(--sp-4) 120px;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-4);
-}
-
-/* ---- Hero number ---- */
-.stats-hero {
-  background: var(--bg-card);
-  border-radius: var(--r-xl);
-  padding: var(--sp-6) var(--sp-5);
-  border: 1px solid var(--border-ghost);
-  display: flex;
-  gap: var(--sp-4);
-  justify-content: space-around;
-}
-
-.stats-hero-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp-1);
-}
-
-.stats-hero-num {
-  font-size: 2.2rem;
-  font-weight: 900;
-  color: var(--amber);
-  line-height: 1;
-}
-
-.stats-hero-label {
-  font-size: var(--fs-micro);
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-dim-2);
-}
-
-/* ---- Per-category breakdown ---- */
 .stats-cat-row {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid var(--border-ghost);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .stats-cat-row:last-child { border-bottom: none; }
 
@@ -56,48 +15,45 @@
 
 .stats-cat-body { flex: 1; min-width: 0; }
 .stats-cat-name {
-  font-size: var(--fs-small);
+  font-size: 0.76rem;
   font-weight: 800;
-  color: var(--text);
+  color: #fff;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
 }
 .stats-cat-count {
-  font-size: var(--fs-micro);
-  color: var(--text-dim-2);
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.38);
   font-weight: 600;
   margin-top: 2px;
 }
 
-.stats-cat-rating {
-  font-size: 11px;
-  flex-shrink: 0;
-}
+.stats-cat-rating { font-size: 11px; flex-shrink: 0; color: var(--current-accent); }
 
-/* ---- Top items ---- */
 .stats-top-item {
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid var(--border-ghost);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 .stats-top-item:last-child { border-bottom: none; }
 
 .stats-top-rank {
-  font-size: var(--fs-micro);
+  font-size: 0.62rem;
   font-weight: 900;
-  color: var(--amber);
+  color: var(--current-accent);
   width: 18px;
   flex-shrink: 0;
   text-align: center;
+  transition: color 0.32s ease;
 }
 
 .stats-top-poster {
   width: 34px;
   height: 50px;
-  border-radius: var(--r-xs);
-  background: var(--bg-subtle);
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
   background-size: cover;
   background-position: center;
   flex-shrink: 0;
@@ -105,18 +61,18 @@
 
 .stats-top-body { flex: 1; min-width: 0; }
 .stats-top-title {
-  font-size: var(--fs-small);
-  font-weight: 800;
-  color: var(--text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #fff;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .stats-top-cat {
-  font-size: var(--fs-micro);
-  color: var(--text-dim-2);
+  font-size: 0.62rem;
+  color: rgba(255,255,255,0.35);
   font-weight: 600;
   margin-top: 2px;
 }
 
-.stats-top-rating { font-size: 11px; flex-shrink: 0; }
+.stats-top-rating { font-size: 11px; flex-shrink: 0; color: var(--current-accent); transition: color 0.32s ease; }
