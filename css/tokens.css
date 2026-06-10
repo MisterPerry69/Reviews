@@ -1,50 +1,59 @@
 /* ============================================
-   rank★d — Design tokens
+   rank★d — Design tokens · Liquid/Jelly
    ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --font-display: 'Bebas Neue', system-ui, sans-serif;
-  --font-body:    'DM Sans', system-ui, sans-serif;
+  /* Font: Fredoka (display tondo, gommoso) + Outfit (body geometrico morbido) */
+  --font-display: 'Fredoka', system-ui, sans-serif;
+  --font-body:    'Outfit', system-ui, sans-serif;
 
-  /* Base scura neutra */
-  --base:    #0b0b10;
-  --surface: rgba(255,255,255,0.06);
-  --surface-raised: rgba(255,255,255,0.09);
+  /* Base */
+  --base:    #14121c;
+  --base-2:  #1c1926;
+  --surface:        rgba(255,255,255,0.07);
+  --surface-raised: rgba(255,255,255,0.12);
 
   /* Testo */
-  --text:     #ffffff;
-  --text-dim: rgba(255,255,255,0.58);
-  --text-faint: rgba(255,255,255,0.28);
+  --text:       #ffffff;
+  --text-dim:   rgba(255,255,255,0.62);
+  --text-faint: rgba(255,255,255,0.34);
 
-  /* Bordi */
-  --border:      rgba(255,255,255,0.09);
-  --border-soft: rgba(255,255,255,0.14);
+  --border:      rgba(255,255,255,0.10);
+  --border-soft: rgba(255,255,255,0.16);
 
-  /* Colori categoria — VIVIDI */
-  --cat-all:   #0b0b10;
-  --cat-film:  #f97316;
-  --cat-serie: #3b82f6;
-  --cat-game:  #16a34a;
-  --cat-comic: #9333ea;
+  /* ── Colori categoria — VIVIDI e CALDI ── */
+  --cat-all:   #ffb627;  /* ambra dorata */
+  --cat-film:  #ff6b35;  /* arancio corallo */
+  --cat-serie: #4d96ff;  /* blu acceso */
+  --cat-game:  #2bd576;  /* verde lime */
+  --cat-comic: #b06bff;  /* viola pop */
 
-  /* Stato corrente — JS sovrascrive */
-  --current:    #f97316;
-  --current-bg: #0b0b10;
+  /* bg flood saturo ma leggibile per ogni categoria */
+  --bg-all:   #221c10;
+  --bg-film:  #2a1006;
+  --bg-serie: #08152e;
+  --bg-game:  #06241a;
+  --bg-comic: #1c0a2e;
 
-  /* Semantici */
-  --positive: #4ade80;
-  --negative: #f87171;
+  /* Stato corrente — JS sovrascrive su :root */
+  --current:    #ffb627;
+  --current-bg: #221c10;
+  --current-rgb: 255,182,39;
 
-  /* Radii */
-  --r-sm:   8px;
-  --r:      12px;
-  --r-lg:   18px;
-  --r-xl:   24px;
+  --positive: #2bd576;
+  --negative: #ff6b6b;
+
+  /* Radii — tutto molto tondo */
+  --r-sm:   12px;
+  --r:      18px;
+  --r-lg:   24px;
+  --r-xl:   32px;
   --r-pill: 999px;
 
-  /* Transition */
-  --ease-color: background-color 0.35s cubic-bezier(0.4,0,0.2,1),
-                color 0.22s ease;
+  /* Easing flowy */
+  --ease-jelly:  cubic-bezier(0.34, 1.56, 0.64, 1);   /* overshoot elastico */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);        /* deciso ma morbido */
 }

@@ -1,13 +1,11 @@
 /* ============================================
-   rank★d — List view: render + filtri
+   rank★d — List render
    ============================================ */
 
-let _allReviews = [];
+let _allReviews  = [];
 let _searchQuery = "";
 
 window._allReviewsCache = _allReviews;
-
-/* ---- Caricamento ---- */
 
 async function loadAllReviews() {
   _showSkeletons();
@@ -15,11 +13,11 @@ async function loadAllReviews() {
     const data = await apiPost("reviews_get_all");
     _allReviews = data.reviews || [];
     window._allReviewsCache = _allReviews;
-    _render();
+    _render(true);
   } catch(e) {
     console.error("loadAllReviews:", e);
     document.getElementById("reviews-list").innerHTML =
-      '<div class="empty-state">Errore caricamento. Riprova.</div>';
+      '<div class="empty-state">Errore caricamento.<br>Riprova.</div>';
   }
 }
 
@@ -30,17 +28,15 @@ function _showSkeletons() {
 
 function refreshReviews() { loadAllReviews(); }
 
-/* ---- Render ---- */
-
-function _render() {
+function _render(animate) {
   const state = typeof _currentState !== "undefined" ? _currentState : "reviews";
   const cat   = typeof _currentCat   !== "undefined" ? _currentCat   : "ALL";
 
   let items = _allReviews;
 
-  if (state === "wishlist")  items = items.filter(isWish);
+  if (state === "wishlist")      items = items.filter(isWish);
   else if (state === "progress") items = items.filter(isProgress);
-  else items = items.filter(r => !isWish(r) && !isProgress(r));
+  else                           items = items.filter(r => !isWish(r) && !isProgress(r));
 
   if (cat !== "ALL") items = items.filter(r => getCleanCat(r) === cat);
 
@@ -50,18 +46,28 @@ function _render() {
       (r.titolo    || "").toLowerCase().includes(q) ||
       (r.commento  || "").toLowerCase().includes(q) ||
       (r.metadata  || "").toLowerCase().includes(q) ||
-      (r.riassunto || "").toLowerCase().includes(q)
-    );
+      (r.riassunto || "").toLowerCase().includes(q));
   }
 
   const list = document.getElementById("reviews-list");
+
   if (items.length === 0) {
-    list.innerHTML = '<div class="empty-state">Nessuna voce trovata</div>';
+    const msg = state === "wishlist" ? "Wishlist vuota"
+              : state === "progress" ? "Niente in corso"
+              : "Nessuna recensione qui";
+    list.innerHTML = `<div class="empty-state">${msg}</div>`;
     return;
   }
+
+  list.classList.remove("animate-in");
   list.innerHTML = items.map(_renderCard).join("");
   _bindCardClicks();
   if (typeof lucide !== "undefined") lucide.createIcons({ nodes: [list] });
+
+  if (animate) {
+    void list.offsetWidth;
+    list.classList.add("animate-in");
+  }
 }
 
 function _renderCard(r) {
@@ -70,17 +76,11 @@ function _renderCard(r) {
   const wish     = isWish(r);
   const progress = isProgress(r);
 
-  const posterStyle = r.image_url
-    ? `background-image: url('${escapeHtml(r.image_url)}')`
-    : "";
-  const badge = wish
-    ? '<span class="review-poster-badge wish">Wish</span>'
-    : progress
-    ? '<span class="review-poster-badge progress">In corso</span>'
-    : "";
-
-  const stateLabel = wish ? "Wish" : progress ? "In corso" : cat;
-  const catBgClass = `cat-${cat.toLowerCase()}`;
+  const posterStyle = r.image_url ? `background-image:url('${escapeHtml(r.image_url)}')` : "";
+  const badge = wish     ? '<span class="review-poster-badge wish">Wish</span>'
+              : progress ? '<span class="review-poster-badge progress">In corso</span>'
+              : "";
+  const metaLabel = wish ? "Wish" : progress ? "In corso" : cat;
 
   return `
     <div class="review-card" data-id="${escapeHtml(r.id)}" data-cat="${escapeHtml(cat)}">
@@ -92,12 +92,11 @@ function _renderCard(r) {
         <div class="review-info-top">
           <div class="review-title">${escapeHtml(r.titolo)}</div>
           ${!wish && !progress && r.rating > 0
-            ? `<div class="review-rating stars">${renderStars(r.rating)}</div>`
-            : ""}
+            ? `<div class="review-rating stars">${renderStars(r.rating)}</div>` : ""}
         </div>
         <div class="review-snippet">${escapeHtml(r.riassunto || r.commento)}</div>
         <div class="review-meta-row">
-          <span class="cat-badge">${escapeHtml(stateLabel)}</span>
+          <span class="cat-badge">${escapeHtml(metaLabel)}</span>
           <span class="review-date">${formatDate(r.data)}</span>
         </div>
       </div>
@@ -107,15 +106,8 @@ function _renderCard(r) {
 function _bindCardClicks() {
   document.querySelectorAll(".review-card").forEach(card => {
     card.addEventListener("click", () => {
-      const id = card.dataset.id;
-      const review = _allReviews.find(r => r.id === id);
-      if (review) openDetail(review);
+      const r = _allReviews.find(x => x.id === card.dataset.id);
+      if (r) openDetail(r);
     });
   });
 }
-
-/* ---- DOMContentLoaded ---- */
-
-document.addEventListener("DOMContentLoaded", () => {
-  // Nessun search input nell'HTML nuovo — niente da bindare qui
-});

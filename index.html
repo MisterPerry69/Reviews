@@ -19,10 +19,9 @@
 
   <!-- SPLASH -->
   <div id="splash" class="splash">
+    <div class="splash-blob"></div>
     <img class="splash-logo" src="logo.svg" alt="rank★d" />
-    <div class="splash-bar-wrap">
-      <div class="splash-bar" id="splash-bar"></div>
-    </div>
+    <div class="splash-dots"><span></span><span></span><span></span></div>
   </div>
 
   <!-- APP SHELL -->
@@ -32,85 +31,65 @@
     <header class="app-header">
       <img class="header-logo" src="logo.svg" alt="rank★d" />
       <div class="header-actions">
-        <!-- Home / torna alle recensioni -->
-        <button class="header-icon-btn active" id="state-reviews" data-state="reviews" aria-label="Recensioni">
+        <button class="header-icon-btn active" data-state="reviews" aria-label="Recensioni">
           <i data-lucide="layout-grid"></i>
         </button>
-        <!-- In corso -->
-        <button class="header-icon-btn" id="state-progress" data-state="progress" aria-label="In corso">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="19" height="19">
-            <circle cx="12" cy="12" r="9" stroke-dasharray="30 57" stroke-dashoffset="-14"/>
-            <polyline points="9 12 11 14 15 10"/>
+        <button class="header-icon-btn" data-state="progress" aria-label="In corso">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+            <circle cx="12" cy="12" r="9" stroke-dasharray="32 60" stroke-dashoffset="-16"/>
+            <polyline points="8.5 12 11 14.5 15.5 9.5"/>
           </svg>
         </button>
-        <!-- Wishlist -->
-        <button class="header-icon-btn" id="state-wishlist" data-state="wishlist" aria-label="Wishlist">
+        <button class="header-icon-btn" data-state="wishlist" aria-label="Wishlist">
           <i data-lucide="bookmark"></i>
         </button>
-        <!-- Stats -->
-        <button class="header-icon-btn" id="state-stats" data-state="stats" aria-label="Statistiche">
+        <button class="header-icon-btn" data-state="stats" aria-label="Statistiche">
           <i data-lucide="bar-chart-2"></i>
         </button>
       </div>
     </header>
 
-    <!-- CATEGORY TABS -->
-    <nav class="cat-tabs">
-      <button class="cat-tab active" data-cat="ALL">
-        <div class="cat-tab-pill">
-          <svg class="cat-tab-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-            <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-            <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-            <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-          </svg>
-        </div>
+    <!-- CATEGORY TABS con pill scorrevole -->
+    <nav class="cat-tabs" id="cat-tabs">
+      <div class="tab-indicator" id="tab-indicator"></div>
+      <button class="cat-tab active" data-cat="ALL" aria-label="Tutte">
+        <svg class="cat-tab-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6.5" cy="6.5" r="3"/><circle cx="17.5" cy="6.5" r="3"/>
+          <circle cx="6.5" cy="17.5" r="3"/><circle cx="17.5" cy="17.5" r="3"/>
+        </svg>
       </button>
-      <button class="cat-tab" data-cat="FILM">
-        <div class="cat-tab-pill">
-          <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="5" width="20" height="14" rx="2"/>
-            <line x1="7" y1="5" x2="7" y2="19"/>
-            <line x1="17" y1="5" x2="17" y2="19"/>
-            <line x1="2" y1="10" x2="7" y2="10"/>
-            <line x1="17" y1="10" x2="22" y2="10"/>
-            <line x1="2" y1="15" x2="7" y2="15"/>
-            <line x1="17" y1="15" x2="22" y2="15"/>
-          </svg>
-        </div>
+      <button class="cat-tab" data-cat="FILM" aria-label="Film">
+        <svg class="cat-tab-icon stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="5" width="19" height="14" rx="3"/>
+          <line x1="7" y1="5" x2="7" y2="19"/><line x1="17" y1="5" x2="17" y2="19"/>
+          <line x1="2.5" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21.5" y2="12"/>
+        </svg>
       </button>
-      <button class="cat-tab" data-cat="SERIE">
-        <div class="cat-tab-pill">
-          <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="4" width="20" height="14" rx="2"/>
-            <line x1="8" y1="22" x2="16" y2="22"/>
-            <line x1="12" y1="18" x2="12" y2="22"/>
-          </svg>
-        </div>
+      <button class="cat-tab" data-cat="SERIE" aria-label="Serie">
+        <svg class="cat-tab-icon stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2.5" y="4.5" width="19" height="13" rx="3"/>
+          <path d="M8.5 21h7"/><path d="M12 17.5V21"/>
+        </svg>
       </button>
-      <button class="cat-tab" data-cat="GAME">
-        <div class="cat-tab-pill">
-          <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 4H7C4.24 4 2 6.24 2 9v5c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V9c0-2.76-2.24-5-5-5z"/>
-            <line x1="6" y1="12" x2="10" y2="12"/>
-            <line x1="8" y1="10" x2="8" y2="14"/>
-            <circle cx="15.5" cy="11.5" r="0.7" fill="currentColor" stroke="none"/>
-            <circle cx="17.5" cy="13.5" r="0.7" fill="currentColor" stroke="none"/>
-          </svg>
-        </div>
+      <button class="cat-tab" data-cat="GAME" aria-label="Game">
+        <svg class="cat-tab-icon stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17 5.5H7A5 5 0 0 0 2 10.5v3a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5v-3a5 5 0 0 0-5-5z"/>
+          <line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/>
+          <circle cx="15.5" cy="11" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="18" cy="13.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
       </button>
-      <button class="cat-tab" data-cat="COMIC">
-        <div class="cat-tab-pill">
-          <svg class="cat-tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-          </svg>
-        </div>
+      <button class="cat-tab" data-cat="COMIC" aria-label="Comics">
+        <svg class="cat-tab-icon stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v15.5H7.5A2.5 2.5 0 0 0 5 20V4.5z"/>
+          <path d="M5 17.5A2.5 2.5 0 0 1 7.5 20H19"/>
+        </svg>
       </button>
     </nav>
 
-    <!-- LIST AREA -->
+    <!-- LIST AREA + flood overlay -->
     <div id="list-area" class="list-area">
+      <div class="flood-veil" id="flood-veil"></div>
       <div id="reviews-list" class="reviews-list"></div>
     </div>
 
@@ -146,12 +125,10 @@
       </div>
     </div>
 
-    <!-- BOTTOM BAR -->
-    <div class="bottom-bar">
-      <button class="fab" id="fab-new" aria-label="Nuova voce">
-        <i data-lucide="plus"></i>
-      </button>
-    </div>
+    <!-- FAB galleggiante (fuori dal flusso) -->
+    <button class="fab" id="fab-new" aria-label="Nuova voce">
+      <i data-lucide="plus"></i>
+    </button>
 
   </div><!-- #app -->
 
@@ -160,9 +137,7 @@
   <div id="detail-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="detail-hero">
-        <!-- Sfondo blurred -->
         <img id="detail-hero-img" class="detail-hero-img hidden" src="" alt="" />
-        <!-- Poster centrato sopra lo sfondo -->
         <img id="detail-hero-poster" class="detail-hero-poster hidden" src="" alt="" />
         <div id="detail-hero-placeholder" class="detail-hero-placeholder hidden"></div>
         <div class="detail-hero-gradient"></div>
@@ -210,7 +185,7 @@
       </div>
       <div class="entry-body">
         <p class="entry-hint">
-          Scrivi in modo naturale — l'AI sistema la forma mantenendo il tuo tono.<br>
+          Scrivi come parli — l'AI sistema la forma mantenendo il tuo tono.<br>
           Es: "Dune parte 2, visivamente pazzesco, storia un po' lunga però. 4/5"
         </p>
         <textarea id="entry-textarea" class="entry-textarea" placeholder="Scrivi qui..." rows="5"></textarea>

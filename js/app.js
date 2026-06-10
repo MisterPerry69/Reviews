@@ -1,22 +1,22 @@
 /* ============================================
-   rank★d — Init, utils, navigazione
+   rank★d — Init, navigazione, animazioni
    ============================================ */
 
 const CAT_EMOJI = { FILM: "🎬", SERIE: "📺", GAME: "🎮", COMIC: "📚" };
 
-/* Colori per ogni categoria — applicati su :root */
+/* accent + bg flood + rgb (per le ombre) di ogni categoria */
 const CAT_TOKENS = {
-  ALL:   { accent: "#e2d5b8", bg: "#0b0b10" },
-  FILM:  { accent: "#f97316", bg: "#1a0a00" },
-  SERIE: { accent: "#3b82f6", bg: "#00091a" },
-  GAME:  { accent: "#16a34a", bg: "#001a0a" },
-  COMIC: { accent: "#9333ea", bg: "#0e001a" },
+  ALL:   { accent: "#ffb627", bg: "#221c10", rgb: "255,182,39"  },
+  FILM:  { accent: "#ff6b35", bg: "#2a1006", rgb: "255,107,53"  },
+  SERIE: { accent: "#4d96ff", bg: "#08152e", rgb: "77,150,255"  },
+  GAME:  { accent: "#2bd576", bg: "#06241a", rgb: "43,213,118"  },
+  COMIC: { accent: "#b06bff", bg: "#1c0a2e", rgb: "176,107,255" },
 };
 
 const CATS = ["ALL", "FILM", "SERIE", "GAME", "COMIC"];
 
 let _currentCat   = "ALL";
-let _currentState = "reviews"; // "reviews" | "progress" | "wishlist" | "stats"
+let _currentState = "reviews";
 
 /* ── Helpers ── */
 function escapeHtml(str) {
@@ -24,64 +24,96 @@ function escapeHtml(str) {
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
-
-function getCleanCat(review) {
-  return (review.categoria || "")
-    .replace(/,?\s*WISH/i, "").replace(/,?\s*IN_PROGRESS/i, "")
-    .trim().toUpperCase();
+function getCleanCat(r) {
+  return (r.categoria || "").replace(/,?\s*WISH/i, "").replace(/,?\s*IN_PROGRESS/i, "").trim().toUpperCase();
 }
-
-function isWish(review)     { return (review.categoria || "").toUpperCase().includes("WISH"); }
-function isProgress(review) { return (review.categoria || "").toUpperCase().includes("IN_PROGRESS"); }
+function isWish(r)     { return (r.categoria || "").toUpperCase().includes("WISH"); }
+function isProgress(r) { return (r.categoria || "").toUpperCase().includes("IN_PROGRESS"); }
 
 function renderStars(rating) {
   const full  = Math.floor(rating);
   const half  = rating % 1 >= 0.5 ? 1 : 0;
   const empty = 5 - full - half;
-  return (
-    "★".repeat(full) +
+  return "★".repeat(full) +
     (half ? '<span class="half">½</span>' : "") +
-    '<span class="empty">' + "★".repeat(empty) + "</span>"
-  );
+    '<span class="empty">' + "★".repeat(empty) + "</span>";
 }
-
 function formatDate(dateStr) {
   if (!dateStr) return "";
-  const parts = dateStr.split("-");
-  if (parts.length < 3) return dateStr;
-  const months = ["GEN","FEB","MAR","APR","MAG","GIU","LUG","AGO","SET","OTT","NOV","DIC"];
-  return parts[2] + " " + (months[parseInt(parts[1], 10) - 1] || parts[1]);
+  const p = dateStr.split("-");
+  if (p.length < 3) return dateStr;
+  const m = ["GEN","FEB","MAR","APR","MAG","GIU","LUG","AGO","SET","OTT","NOV","DIC"];
+  return p[2] + " " + (m[parseInt(p[1], 10) - 1] || p[1]);
 }
 
-/* ── Color flood ── */
+/* ── Applica colori categoria su :root ── */
 function _applyTokens(cat) {
   const t = CAT_TOKENS[cat] || CAT_TOKENS.ALL;
   const s = document.documentElement.style;
-  s.setProperty("--current",    t.accent);
-  s.setProperty("--current-bg", t.bg);
+  s.setProperty("--current",     t.accent);
+  s.setProperty("--current-bg",  t.bg);
+  s.setProperty("--current-rgb", t.rgb);
 }
 
-/* ── Tab categoria + flood ── */
-function setCategory(cat) {
+/* ── Posiziona la pill scorrevole sotto la tab attiva ── */
+function _movePill(animate) {
+  const tabs = document.getElementById("cat-tabs");
+  const pill = document.getElementById("tab-indicator");
+  const active = tabs.querySelector(".cat-tab.active");
+  if (!active || !pill) return;
+
+  // primo posizionamento senza transizione (evita lo "scivolone" da 0)
+  if (!animate) {
+    const prev = pill.style.transition;
+    pill.style.transition = "none";
+    pill.style.width = active.offsetWidth + "px";
+    pill.style.transform = `translateX(${active.offsetLeft - 6}px)`;
+    void pill.offsetWidth;
+    pill.style.transition = prev;
+    return;
+  }
+
+  pill.style.width = active.offsetWidth + "px";
+  pill.style.transform = `translateX(${active.offsetLeft - 6}px)`;
+}
+
+/* ── Flood a tendina dal lato del cambio ── */
+function _playFlood(toCat, direction) {
+  const veil = document.getElementById("flood-veil");
+  const t = CAT_TOKENS[toCat] || CAT_TOKENS.ALL;
+  veil.style.setProperty("--flood-color", t.bg);
+
+  veil.classList.remove("flood-from-left", "flood-from-right");
+  void veil.offsetWidth;
+  veil.classList.add(direction > 0 ? "flood-from-right" : "flood-from-left");
+}
+
+/* ── Cambio categoria (con flood + stagger) ── */
+function setCategory(cat, direction) {
   if (cat === _currentCat) return;
+
+  const prevIdx = CATS.indexOf(_currentCat);
+  const newIdx  = CATS.indexOf(cat);
+  const dir = typeof direction === "number" ? direction : (newIdx > prevIdx ? 1 : -1);
+
   _currentCat = cat;
 
-  document.querySelectorAll(".cat-tab").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.cat === cat);
-  });
+  document.querySelectorAll(".cat-tab").forEach(b =>
+    b.classList.toggle("active", b.dataset.cat === cat));
 
   _applyTokens(cat);
+  _movePill(true);
+  _playFlood(cat, dir);
 
-  if (typeof _render === "function") _render();
+  // attendi metà flood, poi swappa il contenuto sotto il velo
+  setTimeout(() => { if (typeof _render === "function") _render(true); }, 230);
 }
 
-/* ── Icone header: stato lista ── */
+/* ── Icone header: stato ── */
 function setHeaderState(state) {
   _currentState = state;
-
-  document.querySelectorAll(".header-icon-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.state === state);
-  });
+  document.querySelectorAll(".header-icon-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.state === state));
 
   const listArea  = document.getElementById("list-area");
   const statsView = document.getElementById("stats-view");
@@ -93,79 +125,66 @@ function setHeaderState(state) {
   } else {
     statsView.classList.add("hidden");
     listArea.classList.remove("hidden");
-    if (typeof _render === "function") _render();
+    if (typeof _render === "function") _render(true);
   }
 }
 
-/* ── Swipe tra categorie ── */
+/* ── Swipe ── */
 function _initSwipe() {
   const area = document.getElementById("list-area");
-  let startX = 0, startY = 0;
+  let startX = 0, startY = 0, tracking = false;
 
   area.addEventListener("touchstart", e => {
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
+    tracking = true;
   }, { passive: true });
 
   area.addEventListener("touchend", e => {
+    if (!tracking) return;
+    tracking = false;
     const dx = e.changedTouches[0].clientX - startX;
     const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    if (Math.abs(dx) > 48 && dy < 60) {
+    if (Math.abs(dx) > 55 && dy < 50) {
       const idx = CATS.indexOf(_currentCat);
-      if (dx < 0 && idx < CATS.length - 1) setCategory(CATS[idx + 1]);
-      if (dx > 0 && idx > 0)               setCategory(CATS[idx - 1]);
+      if (dx < 0 && idx < CATS.length - 1) setCategory(CATS[idx + 1], 1);
+      if (dx > 0 && idx > 0)               setCategory(CATS[idx - 1], -1);
     }
   }, { passive: true });
 }
 
 /* ── Splash ── */
-function _animateSplashBar() {
-  return new Promise(resolve => {
-    const bar = document.getElementById("splash-bar");
-    let pct = 0;
-    const iv = setInterval(() => {
-      pct += Math.random() * 16 + 5;
-      if (pct >= 88) { pct = 88; clearInterval(iv); resolve(); }
-      bar.style.width = pct + "%";
-    }, 80);
-  });
-}
-
 document.addEventListener("DOMContentLoaded", async () => {
-  /* Colori iniziali */
   _applyTokens("ALL");
 
-  /* Tab categorie */
   document.querySelectorAll(".cat-tab").forEach(btn => {
     btn.addEventListener("click", () => setCategory(btn.dataset.cat));
   });
-
-  /* Header state icons */
   document.querySelectorAll(".header-icon-btn").forEach(btn => {
     btn.addEventListener("click", () => setHeaderState(btn.dataset.state));
   });
-
-  /* FAB */
   document.getElementById("fab-new").addEventListener("click", () => openEntry());
 
-  /* Swipe */
   _initSwipe();
+  window.addEventListener("resize", () => _movePill(false));
 
-  /* Splash */
-  await Promise.all([
-    _animateSplashBar(),
-    loadAllReviews().catch(() => null),
-  ]);
+  await loadAllReviews().catch(() => null);
 
-  document.getElementById("splash-bar").style.width = "100%";
-  await new Promise(r => setTimeout(r, 180));
+  // splash min 1.1s per far vedere il blob
+  await new Promise(r => setTimeout(r, 1100));
 
   const splash = document.getElementById("splash");
   splash.classList.add("fade-out");
-  await new Promise(r => setTimeout(r, 420));
+  await new Promise(r => setTimeout(r, 440));
   splash.style.display = "none";
 
   const app = document.getElementById("app");
   app.classList.remove("hidden");
   if (typeof lucide !== "undefined") lucide.createIcons();
+
+  // posiziona la pill ora che il layout è visibile
+  requestAnimationFrame(() => {
+    _movePill(false);
+    if (typeof _render === "function") _render(true);
+  });
 });
