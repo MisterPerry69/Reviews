@@ -1,39 +1,39 @@
 /* ============================================
-   rank★d — Init & shared utils
+   rank★d — Init, utils, navigazione
    ============================================ */
 
 const CAT_EMOJI = { FILM: "🎬", SERIE: "📺", GAME: "🎮", COMIC: "📚" };
 
+/* Colori per ogni categoria — applicati su :root */
 const CAT_TOKENS = {
-  ALL:   { bg: "#1a1a2e", accent: "#e2d5b8" },
-  FILM:  { bg: "#f97316", accent: "#ffffff" },
-  SERIE: { bg: "#3b82f6", accent: "#ffffff" },
-  GAME:  { bg: "#22c55e", accent: "#0d0d14" },
-  COMIC: { bg: "#a855f7", accent: "#ffffff" },
+  ALL:   { accent: "#e2d5b8", bg: "#0b0b10" },
+  FILM:  { accent: "#f97316", bg: "#1a0a00" },
+  SERIE: { accent: "#3b82f6", bg: "#00091a" },
+  GAME:  { accent: "#16a34a", bg: "#001a0a" },
+  COMIC: { accent: "#9333ea", bg: "#0e001a" },
 };
 
 const CATS = ["ALL", "FILM", "SERIE", "GAME", "COMIC"];
 
 let _currentCat   = "ALL";
-let _currentState = "reviews"; // "reviews" | "wishlist" | "progress" | "stats"
+let _currentState = "reviews"; // "reviews" | "progress" | "wishlist" | "stats"
 
-/* ---- Escape ---- */
+/* ── Helpers ── */
 function escapeHtml(str) {
   return String(str || "")
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-/* ---- Category helpers ---- */
 function getCleanCat(review) {
   return (review.categoria || "")
     .replace(/,?\s*WISH/i, "").replace(/,?\s*IN_PROGRESS/i, "")
     .trim().toUpperCase();
 }
+
 function isWish(review)     { return (review.categoria || "").toUpperCase().includes("WISH"); }
 function isProgress(review) { return (review.categoria || "").toUpperCase().includes("IN_PROGRESS"); }
 
-/* ---- Stars ---- */
 function renderStars(rating) {
   const full  = Math.floor(rating);
   const half  = rating % 1 >= 0.5 ? 1 : 0;
@@ -45,23 +45,23 @@ function renderStars(rating) {
   );
 }
 
-/* ---- Date ---- */
 function formatDate(dateStr) {
   if (!dateStr) return "";
-  const [, mm, dd] = dateStr.split("-");
+  const parts = dateStr.split("-");
+  if (parts.length < 3) return dateStr;
   const months = ["GEN","FEB","MAR","APR","MAG","GIU","LUG","AGO","SET","OTT","NOV","DIC"];
-  return dd + " " + (months[parseInt(mm, 10) - 1] || mm);
+  return parts[2] + " " + (months[parseInt(parts[1], 10) - 1] || parts[1]);
 }
 
-/* ---- Color flood: aggiorna CSS vars su :root ---- */
-function _applyColorTokens(cat) {
+/* ── Color flood ── */
+function _applyTokens(cat) {
   const t = CAT_TOKENS[cat] || CAT_TOKENS.ALL;
-  const root = document.documentElement.style;
-  root.setProperty("--current-bg",     t.bg);
-  root.setProperty("--current-accent", t.accent);
+  const s = document.documentElement.style;
+  s.setProperty("--current",    t.accent);
+  s.setProperty("--current-bg", t.bg);
 }
 
-/* ---- Set category (tab + color flood) ---- */
+/* ── Tab categoria + flood ── */
 function setCategory(cat) {
   if (cat === _currentCat) return;
   _currentCat = cat;
@@ -70,12 +70,12 @@ function setCategory(cat) {
     btn.classList.toggle("active", btn.dataset.cat === cat);
   });
 
-  _applyColorTokens(cat);
+  _applyTokens(cat);
 
   if (typeof _render === "function") _render();
 }
 
-/* ---- Set state (header icons) ---- */
+/* ── Icone header: stato lista ── */
 function setHeaderState(state) {
   _currentState = state;
 
@@ -97,7 +97,7 @@ function setHeaderState(state) {
   }
 }
 
-/* ---- Swipe between categories ---- */
+/* ── Swipe tra categorie ── */
 function _initSwipe() {
   const area = document.getElementById("list-area");
   let startX = 0, startY = 0;
@@ -110,7 +110,7 @@ function _initSwipe() {
   area.addEventListener("touchend", e => {
     const dx = e.changedTouches[0].clientX - startX;
     const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    if (Math.abs(dx) > 50 && dy < 60) {
+    if (Math.abs(dx) > 48 && dy < 60) {
       const idx = CATS.indexOf(_currentCat);
       if (dx < 0 && idx < CATS.length - 1) setCategory(CATS[idx + 1]);
       if (dx > 0 && idx > 0)               setCategory(CATS[idx - 1]);
@@ -118,13 +118,13 @@ function _initSwipe() {
   }, { passive: true });
 }
 
-/* ---- Splash ---- */
+/* ── Splash ── */
 function _animateSplashBar() {
   return new Promise(resolve => {
     const bar = document.getElementById("splash-bar");
     let pct = 0;
     const iv = setInterval(() => {
-      pct += Math.random() * 14 + 4;
+      pct += Math.random() * 16 + 5;
       if (pct >= 88) { pct = 88; clearInterval(iv); resolve(); }
       bar.style.width = pct + "%";
     }, 80);
@@ -132,42 +132,40 @@ function _animateSplashBar() {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Inizializza colori default
-  _applyColorTokens("ALL");
+  /* Colori iniziali */
+  _applyTokens("ALL");
 
-  // Tab categorie
+  /* Tab categorie */
   document.querySelectorAll(".cat-tab").forEach(btn => {
     btn.addEventListener("click", () => setCategory(btn.dataset.cat));
   });
 
-  // Header state icons
+  /* Header state icons */
   document.querySelectorAll(".header-icon-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const s = btn.dataset.state;
-      if (_currentState === s && s !== "stats") return;
-      setHeaderState(s);
-    });
+    btn.addEventListener("click", () => setHeaderState(btn.dataset.state));
   });
 
-  // FAB
+  /* FAB */
   document.getElementById("fab-new").addEventListener("click", () => openEntry());
 
-  // Swipe
+  /* Swipe */
   _initSwipe();
 
-  // Splash
+  /* Splash */
   await Promise.all([
     _animateSplashBar(),
     loadAllReviews().catch(() => null),
   ]);
 
   document.getElementById("splash-bar").style.width = "100%";
-  await new Promise(r => setTimeout(r, 200));
+  await new Promise(r => setTimeout(r, 180));
 
   const splash = document.getElementById("splash");
   splash.classList.add("fade-out");
-  await new Promise(r => setTimeout(r, 480));
+  await new Promise(r => setTimeout(r, 420));
   splash.style.display = "none";
-  document.getElementById("app").classList.remove("hidden");
+
+  const app = document.getElementById("app");
+  app.classList.remove("hidden");
   if (typeof lucide !== "undefined") lucide.createIcons();
 });

@@ -1,33 +1,34 @@
 /* ============================================
-   rank★d — List view
+   rank★d — List & Cards
    ============================================ */
 
-/* ---- Cards list ---- */
 .reviews-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 14px 14px calc(env(safe-area-inset-bottom,0px) + 84px);
+  padding: 6px 14px calc(env(safe-area-inset-bottom,0px) + 86px);
 }
 
-/* ---- Review card ---- */
+/* ── Review card ── */
 .review-card {
   display: flex;
-  height: 120px;
+  min-height: 116px;
   background: rgba(0,0,0,0.28);
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.09);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-radius: var(--r-lg);
+  border: 1px solid rgba(255,255,255,0.08);
   overflow: hidden;
   cursor: pointer;
-  transition: transform 0.14s ease, background 0.14s ease;
-  position: relative;
+  transition: transform 0.12s ease, background 0.14s ease;
 }
-.review-card:active { transform: scale(0.98); }
+.review-card:active { transform: scale(0.985); }
 
+/* Poster */
 .review-poster {
-  width: 82px;
+  width: 78px;
   flex-shrink: 0;
-  background: rgba(0,0,0,0.35);
+  background: rgba(0,0,0,0.4);
   background-size: cover;
   background-position: center top;
   position: relative;
@@ -37,28 +38,30 @@
   height: 100%;
   display: grid;
   place-items: center;
-  font-size: 1.8rem;
-  opacity: 0.4;
+  font-size: 1.7rem;
+  opacity: 0.35;
 }
 
+/* Badge sul poster */
 .review-poster-badge {
   position: absolute;
   top: 6px;
   left: 6px;
-  font-size: 0.55rem;
-  font-weight: 800;
+  font-size: 0.52rem;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 2px 6px;
   border-radius: 4px;
   color: #fff;
 }
-.review-poster-badge.wish     { background: rgba(168,85,247,0.9); }
-.review-poster-badge.progress { background: rgba(34,197,94,0.9); }
+.review-poster-badge.wish     { background: rgba(147,51,234,0.88); }
+.review-poster-badge.progress { background: rgba(22,163,74,0.88); }
 
+/* Info */
 .review-info {
   flex: 1;
-  padding: 12px 14px;
+  padding: 12px 14px 12px 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -69,45 +72,48 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
 }
 
+/* Titolo: Bebas Neue, colora col genere della card in vista ALL */
 .review-title {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: var(--current-accent);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  color: var(--current);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   flex: 1;
   min-width: 0;
-  transition: color 0.32s ease;
+  transition: color 0.35s ease;
 }
 
-/* In vista ALL ogni card usa il colore del suo genere */
+/* In vista ALL, il colore viene dal data-cat della card */
 .review-card[data-cat="FILM"]  .review-title { color: var(--cat-film); }
 .review-card[data-cat="SERIE"] .review-title { color: var(--cat-serie); }
 .review-card[data-cat="GAME"]  .review-title { color: var(--cat-game); }
 .review-card[data-cat="COMIC"] .review-title { color: var(--cat-comic); }
 
-.review-rating { font-size: 10px; flex-shrink: 0; }
-
-/* Stars: colore genere in vista ALL */
+/* Stars: stessa logica */
 .review-card[data-cat="FILM"]  .stars { color: var(--cat-film); }
 .review-card[data-cat="SERIE"] .stars { color: var(--cat-serie); }
 .review-card[data-cat="GAME"]  .stars { color: var(--cat-game); }
 .review-card[data-cat="COMIC"] .stars { color: var(--cat-comic); }
 
+.review-rating { font-size: 10px; flex-shrink: 0; }
+
 .review-snippet {
   font-size: 0.72rem;
-  color: rgba(255,255,255,0.58);
   line-height: 1.5;
+  color: rgba(255,255,255,0.5);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex: 1;
-  margin: 4px 0;
+  margin: 5px 0;
 }
 
 .review-meta-row {
@@ -116,53 +122,49 @@
   gap: 8px;
 }
 
+/* Badge categoria nella card — colori fissi per genere */
 .cat-badge {
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 2px 7px;
-  border-radius: 999px;
-  color: var(--current-accent);
-  background: rgba(255,255,255,0.1);
-  transition: color 0.32s ease;
+  background: rgba(255,255,255,0.08);
+  color: var(--current);
+  transition: color 0.35s ease;
 }
-/* Badge per categoria in vista ALL */
-.review-card[data-cat="FILM"]  .cat-badge { color: var(--cat-film);  background: rgba(249,115,22,0.18); }
-.review-card[data-cat="SERIE"] .cat-badge { color: var(--cat-serie); background: rgba(59,130,246,0.18); }
-.review-card[data-cat="GAME"]  .cat-badge { color: var(--cat-game);  background: rgba(34,197,94,0.18); }
-.review-card[data-cat="COMIC"] .cat-badge { color: var(--cat-comic); background: rgba(168,85,247,0.18); }
+.review-card[data-cat="FILM"]  .cat-badge { color: var(--cat-film);  background: rgba(249,115,22,0.15); }
+.review-card[data-cat="SERIE"] .cat-badge { color: var(--cat-serie); background: rgba(59,130,246,0.15); }
+.review-card[data-cat="GAME"]  .cat-badge { color: var(--cat-game);  background: rgba(22,163,74,0.15); }
+.review-card[data-cat="COMIC"] .cat-badge { color: var(--cat-comic); background: rgba(147,51,234,0.15); }
 
 .review-date {
-  font-size: 0.62rem;
-  color: rgba(255,255,255,0.28);
-  font-weight: 600;
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  font-weight: 500;
 }
 
-/* ---- Loading skeleton ---- */
+/* ── Skeleton ── */
 .skeleton-card {
-  height: 120px;
-  background: rgba(0,0,0,0.2);
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.06);
+  height: 116px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--r-lg);
   overflow: hidden;
   position: relative;
 }
 .skeleton-card::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.04) 50%, transparent 100%);
-  animation: shimmer 1.6s ease-in-out infinite;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,255,255,0.06) 50%,
+    transparent 100%);
+  animation: shimmer 1.5s ease-in-out infinite;
 }
 @keyframes shimmer {
   from { transform: translateX(-100%); }
   to   { transform: translateX(100%); }
 }
 
-/* ---- Card enter animation ---- */
-@keyframes cardEnter {
-  from { opacity: 0; transform: translateY(8px); }
+/* ── Entry animation ── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.review-card { animation: cardEnter 0.22s ease both; }
+.review-card { animation: cardIn 0.2s ease both; }

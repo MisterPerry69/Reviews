@@ -1,5 +1,5 @@
 /* ============================================
-   rank★d — Stats
+   rank★d — Stats rows
    ============================================ */
 
 .stats-cat-row {
@@ -7,53 +7,52 @@
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border);
 }
 .stats-cat-row:last-child { border-bottom: none; }
 
-.stats-cat-emoji { font-size: 1.2rem; flex-shrink: 0; }
+.stats-cat-emoji { font-size: 1.1rem; flex-shrink: 0; }
 
 .stats-cat-body { flex: 1; min-width: 0; }
 .stats-cat-name {
-  font-size: 0.76rem;
-  font-weight: 800;
-  color: #fff;
-  text-transform: uppercase;
+  font-family: var(--font-display);
+  font-size: 1rem;
   letter-spacing: 0.06em;
+  color: var(--text);
 }
 .stats-cat-count {
   font-size: 0.62rem;
-  color: rgba(255,255,255,0.38);
-  font-weight: 600;
-  margin-top: 2px;
+  color: var(--text-faint);
+  margin-top: 1px;
 }
 
-.stats-cat-rating { font-size: 11px; flex-shrink: 0; color: var(--current-accent); }
+.stats-cat-rating { font-size: 11px; flex-shrink: 0; }
 
 .stats-top-item {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border);
 }
 .stats-top-item:last-child { border-bottom: none; }
 
 .stats-top-rank {
-  font-size: 0.62rem;
-  font-weight: 900;
-  color: var(--current-accent);
-  width: 18px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--current);
+  width: 20px;
   flex-shrink: 0;
   text-align: center;
-  transition: color 0.32s ease;
+  transition: color 0.35s ease;
 }
 
 .stats-top-poster {
-  width: 34px;
-  height: 50px;
-  border-radius: 6px;
-  background: rgba(255,255,255,0.06);
+  width: 32px;
+  height: 48px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
   background-size: cover;
   background-position: center;
   flex-shrink: 0;
@@ -61,18 +60,17 @@
 
 .stats-top-body { flex: 1; min-width: 0; }
 .stats-top-title {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .stats-top-cat {
-  font-size: 0.62rem;
-  color: rgba(255,255,255,0.35);
-  font-weight: 600;
+  font-size: 0.6rem;
+  color: var(--text-faint);
   margin-top: 2px;
 }
 
-.stats-top-rating { font-size: 11px; flex-shrink: 0; color: var(--current-accent); transition: color 0.32s ease; }
+.stats-top-rating { font-size: 10px; flex-shrink: 0; }
