@@ -1,59 +1,56 @@
 /* ============================================
-   rank★d — Design tokens · Liquid/Jelly
+   rank★d — Design tokens · Soft Pastel
    ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  /* Font: Fredoka (display tondo, gommoso) + Outfit (body geometrico morbido) */
+  /* Font */
   --font-display: 'Fredoka', system-ui, sans-serif;
   --font-body:    'Outfit', system-ui, sans-serif;
 
-  /* Base */
-  --base:    #14121c;
-  --base-2:  #1c1926;
-  --surface:        rgba(255,255,255,0.07);
-  --surface-raised: rgba(255,255,255,0.12);
+  /* ── Base scura (dietro la cartellina) ── */
+  --base: #2c241f;
 
-  /* Testo */
-  --text:       #ffffff;
-  --text-dim:   rgba(255,255,255,0.62);
-  --text-faint: rgba(255,255,255,0.34);
+  /* ── Inchiostro (testi scuri su pastello) ── */
+  --ink:       #2a2622;
+  --ink-dim:   rgba(42,38,34,0.56);
+  --ink-faint: rgba(42,38,34,0.34);
 
-  --border:      rgba(255,255,255,0.10);
-  --border-soft: rgba(255,255,255,0.16);
+  /* ── Palette categoria ──
+     page  = sfondo pastello chiaro (tinge tutto)
+     accent= saturo (titoli, stelle, tab, FAB, badge)
+     card  = superficie crema sopra il pastello          */
+  --all-page:   #f4e2b6;  --all-accent:   #d9871b;  --all-card:   #fdf7ea;  --all-rgb: 217,135,27;
+  --film-page:  #f7ccac;  --film-accent:  #e1561f;  --film-card:  #fdf2e9;  --film-rgb: 225,86,31;
+  --serie-page: #c2d8f0;  --serie-accent: #2767ce;  --serie-card: #eff5fc;  --serie-rgb: 39,103,206;
+  --game-page:  #c3e1bd;  --game-accent:  #2a9a4e;  --game-card:  #eff7ed;  --game-rgb: 42,154,78;
+  --comic-page: #ddc8ee;  --comic-accent: #8338d6;  --comic-card: #f6eefc;  --comic-rgb: 131,56,214;
 
-  /* ── Colori categoria — VIVIDI e CALDI ── */
-  --cat-all:   #ffb627;  /* ambra dorata */
-  --cat-film:  #ff6b35;  /* arancio corallo */
-  --cat-serie: #4d96ff;  /* blu acceso */
-  --cat-game:  #2bd576;  /* verde lime */
-  --cat-comic: #b06bff;  /* viola pop */
+  /* ── Stato corrente (JS sovrascrive su :root durante drag) ── */
+  --current-page:   var(--all-page);
+  --current-accent: var(--all-accent);
+  --current-card:   var(--all-card);
+  --current-rgb:    217,135,27;
 
-  /* bg flood saturo ma leggibile per ogni categoria */
-  --bg-all:   #221c10;
-  --bg-film:  #2a1006;
-  --bg-serie: #08152e;
-  --bg-game:  #06241a;
-  --bg-comic: #1c0a2e;
+  /* Semantici */
+  --positive: #2a9a4e;
+  --negative: #d64545;
 
-  /* Stato corrente — JS sovrascrive su :root */
-  --current:    #ffb627;
-  --current-bg: #221c10;
-  --current-rgb: 255,182,39;
-
-  --positive: #2bd576;
-  --negative: #ff6b6b;
-
-  /* Radii — tutto molto tondo */
+  /* Radii — tondo/cozy */
   --r-sm:   12px;
   --r:      18px;
   --r-lg:   24px;
-  --r-xl:   32px;
+  --r-xl:   30px;
   --r-pill: 999px;
 
+  /* Ombre — SOLO nere morbide, mai colore */
+  --sh-card: 0 4px 16px rgba(40,30,15,0.12);
+  --sh-soft: 0 2px 8px  rgba(40,30,15,0.08);
+  --sh-fab:  0 8px 22px rgba(40,30,15,0.22);
+
   /* Easing flowy */
-  --ease-jelly:  cubic-bezier(0.34, 1.56, 0.64, 1);   /* overshoot elastico */
+  --ease-jelly:  cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
-  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);        /* deciso ma morbido */
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
 }

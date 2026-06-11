@@ -1,5 +1,5 @@
 /* ============================================
-   rank★d — List render
+   rank★d — List render (nel pane attivo)
    ============================================ */
 
 let _allReviews  = [];
@@ -89,15 +89,13 @@ function _renderCard(r) {
         ${badge}
       </div>
       <div class="review-info">
-        <div class="review-info-top">
-          <div class="review-title">${escapeHtml(r.titolo)}</div>
-          ${!wish && !progress && r.rating > 0
-            ? `<div class="review-rating stars">${renderStars(r.rating)}</div>` : ""}
-        </div>
+        <div class="review-title">${escapeHtml(r.titolo)}</div>
         <div class="review-snippet">${escapeHtml(r.riassunto || r.commento)}</div>
         <div class="review-meta-row">
+          ${!wish && !progress && r.rating > 0
+            ? `<span class="review-rating stars">${renderStars(r.rating)}</span>`
+            : `<span class="review-rating"></span>`}
           <span class="cat-badge">${escapeHtml(metaLabel)}</span>
-          <span class="review-date">${formatDate(r.data)}</span>
         </div>
       </div>
     </div>`;

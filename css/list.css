@@ -1,47 +1,46 @@
 /* ============================================
-   rank★d — List & Cards · Jelly
+   rank★d — List & Cards · Soft Pastel
    ============================================ */
 
 .reviews-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 8px 16px calc(env(safe-area-inset-bottom,0px) + 100px);
-  position: relative;
-  z-index: 2;
+  gap: 16px;
+  padding: 14px 12px calc(env(safe-area-inset-bottom,0px) + 84px);
 }
 
-/* ── Card ── */
+/* ── Card crema su pastello ── */
 .review-card {
   display: flex;
-  min-height: 122px;
-  background: rgba(255,255,255,0.06);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  gap: 16px;
+  padding: 14px;                 /* il poster è staccato dai bordi */
+  min-height: 160px;
+  background: var(--current-card);
   border-radius: var(--r-lg);
-  border: 1px solid rgba(255,255,255,0.08);
-  overflow: hidden;
+  box-shadow: var(--sh-card);    /* ombra nera morbida, NO glow */
   cursor: pointer;
-  transition: transform 0.32s var(--ease-jelly), background 0.2s ease;
+  transition: transform 0.32s var(--ease-jelly), box-shadow 0.2s ease, background 0.4s ease;
   will-change: transform;
 }
-.review-card:active { transform: scale(0.96); }
+.review-card:active { transform: scale(0.97); }
 
-/* Poster */
+/* Poster — grande e con angoli propri */
 .review-poster {
-  width: 84px;
+  width: 112px;
   flex-shrink: 0;
-  background: rgba(0,0,0,0.35);
+  align-self: stretch;
+  border-radius: var(--r);
+  background: rgba(42,38,34,0.06);
   background-size: cover;
   background-position: center top;
   position: relative;
+  overflow: hidden;
 }
 .review-poster-placeholder {
   width: 100%; height: 100%;
-  display: grid;
-  place-items: center;
-  font-size: 1.9rem;
-  opacity: 0.4;
+  display: grid; place-items: center;
+  font-size: 2.4rem;
+  opacity: 0.5;
 }
 
 .review-poster-badge {
@@ -49,94 +48,88 @@
   top: 7px; left: 7px;
   font-size: 0.52rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  padding: 3px 7px;
+  padding: 3px 8px;
   border-radius: var(--r-pill);
   color: #fff;
 }
-.review-poster-badge.wish     { background: var(--cat-comic); }
-.review-poster-badge.progress { background: var(--cat-game); }
+.review-poster-badge.wish     { background: var(--comic-accent); }
+.review-poster-badge.progress { background: var(--game-accent); }
 
 /* Info */
 .review-info {
   flex: 1;
-  padding: 13px 15px 13px 14px;
+  padding: 4px 4px 4px 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   min-width: 0;
+  gap: 7px;
 }
 
-.review-info-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-/* Titolo — Fredoka, colore del genere */
+/* Titolo — nome completo, fino a 2 righe, accent saturo */
 .review-title {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1.12rem;
-  line-height: 1.12;
-  color: var(--current);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  min-width: 0;
-  transition: color 0.4s ease;
-}
-
-/* Colore card = genere proprio (vista ALL) */
-.review-card[data-cat="FILM"]  .review-title { color: var(--cat-film); }
-.review-card[data-cat="SERIE"] .review-title { color: var(--cat-serie); }
-.review-card[data-cat="GAME"]  .review-title { color: var(--cat-game); }
-.review-card[data-cat="COMIC"] .review-title { color: var(--cat-comic); }
-
-.review-card[data-cat="FILM"]  .stars { color: var(--cat-film); }
-.review-card[data-cat="SERIE"] .stars { color: var(--cat-serie); }
-.review-card[data-cat="GAME"]  .stars { color: var(--cat-game); }
-.review-card[data-cat="COMIC"] .stars { color: var(--cat-comic); }
-
-.review-rating { font-size: 11px; flex-shrink: 0; }
-
-.review-snippet {
-  font-size: 0.76rem;
-  line-height: 1.5;
-  color: var(--text-dim);
+  font-size: 1.5rem;
+  line-height: 1.1;
+  color: var(--current-accent);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  flex: 1;
-  margin: 6px 0;
+  transition: color 0.4s ease;
 }
 
+/* In vista ALL ogni card usa l'accent del proprio genere */
+.review-card[data-cat="FILM"]  .review-title { color: var(--film-accent); }
+.review-card[data-cat="SERIE"] .review-title { color: var(--serie-accent); }
+.review-card[data-cat="GAME"]  .review-title { color: var(--game-accent); }
+.review-card[data-cat="COMIC"] .review-title { color: var(--comic-accent); }
+
+.review-card[data-cat="FILM"]  .stars { color: var(--film-accent); }
+.review-card[data-cat="SERIE"] .stars { color: var(--serie-accent); }
+.review-card[data-cat="GAME"]  .stars { color: var(--game-accent); }
+.review-card[data-cat="COMIC"] .stars { color: var(--comic-accent); }
+
+.review-snippet {
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: var(--ink-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Riga meta: stelle a sinistra, categoria a destra */
 .review-meta-row {
   display: flex;
   align-items: center;
-  gap: 9px;
+  justify-content: space-between;
+  margin-top: auto;
 }
+.review-rating { font-size: 18px; }
 
-.review-card[data-cat="FILM"]  .cat-badge { color: var(--cat-film);  background: rgba(255,107,53,0.16); }
-.review-card[data-cat="SERIE"] .cat-badge { color: var(--cat-serie); background: rgba(77,150,255,0.16); }
-.review-card[data-cat="GAME"]  .cat-badge { color: var(--cat-game);  background: rgba(43,213,118,0.16); }
-.review-card[data-cat="COMIC"] .cat-badge { color: var(--cat-comic); background: rgba(176,107,255,0.16); }
+/* Badge categoria — accent del proprio genere in vista ALL */
+.review-card[data-cat="FILM"]  .cat-badge { color: var(--film-accent);  background: rgba(225,86,31,0.13); }
+.review-card[data-cat="SERIE"] .cat-badge { color: var(--serie-accent); background: rgba(39,103,206,0.13); }
+.review-card[data-cat="GAME"]  .cat-badge { color: var(--game-accent);  background: rgba(42,154,78,0.13); }
+.review-card[data-cat="COMIC"] .cat-badge { color: var(--comic-accent); background: rgba(131,56,214,0.13); }
 
 .review-date {
-  font-size: 0.62rem;
-  color: var(--text-faint);
+  font-size: 0.66rem;
+  color: var(--ink-faint);
   font-weight: 500;
 }
 
 /* ── Skeleton ── */
 .skeleton-card {
-  height: 122px;
-  background: rgba(255,255,255,0.05);
+  height: 132px;
+  background: var(--current-card);
   border-radius: var(--r-lg);
+  box-shadow: var(--sh-soft);
   overflow: hidden;
   position: relative;
 }
@@ -144,7 +137,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
   animation: shimmer 1.5s ease-in-out infinite;
 }
 @keyframes shimmer {
@@ -152,21 +145,21 @@
   to   { transform: translateX(100%); }
 }
 
-/* ── Entry stagger — cascata ── */
+/* ── Cascata fluida all'ingresso (lentina e soddisfacente) ── */
 @keyframes cardDrop {
-  0%   { opacity: 0; transform: translateY(-14px) scale(0.94); }
-  60%  { opacity: 1; transform: translateY(4px)   scale(1.01); }
-  100% { opacity: 1; transform: translateY(0)     scale(1); }
+  0%   { opacity: 0; transform: translateY(28px) scale(0.92); }
+  55%  { opacity: 1; transform: translateY(-6px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
 }
 .reviews-list.animate-in .review-card {
-  animation: cardDrop 0.5s var(--ease-jelly) both;
+  animation: cardDrop 0.62s var(--ease-jelly) both;
 }
-.reviews-list.animate-in .review-card:nth-child(1)  { animation-delay: 0.02s; }
-.reviews-list.animate-in .review-card:nth-child(2)  { animation-delay: 0.07s; }
-.reviews-list.animate-in .review-card:nth-child(3)  { animation-delay: 0.12s; }
-.reviews-list.animate-in .review-card:nth-child(4)  { animation-delay: 0.17s; }
-.reviews-list.animate-in .review-card:nth-child(5)  { animation-delay: 0.22s; }
-.reviews-list.animate-in .review-card:nth-child(6)  { animation-delay: 0.27s; }
-.reviews-list.animate-in .review-card:nth-child(7)  { animation-delay: 0.31s; }
-.reviews-list.animate-in .review-card:nth-child(8)  { animation-delay: 0.35s; }
-.reviews-list.animate-in .review-card:nth-child(n+9){ animation-delay: 0.38s; }
+.reviews-list.animate-in .review-card:nth-child(1)  { animation-delay: 0.04s; }
+.reviews-list.animate-in .review-card:nth-child(2)  { animation-delay: 0.12s; }
+.reviews-list.animate-in .review-card:nth-child(3)  { animation-delay: 0.20s; }
+.reviews-list.animate-in .review-card:nth-child(4)  { animation-delay: 0.28s; }
+.reviews-list.animate-in .review-card:nth-child(5)  { animation-delay: 0.36s; }
+.reviews-list.animate-in .review-card:nth-child(6)  { animation-delay: 0.44s; }
+.reviews-list.animate-in .review-card:nth-child(7)  { animation-delay: 0.52s; }
+.reviews-list.animate-in .review-card:nth-child(8)  { animation-delay: 0.60s; }
+.reviews-list.animate-in .review-card:nth-child(n+9){ animation-delay: 0.66s; }

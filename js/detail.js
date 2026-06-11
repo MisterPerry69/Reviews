@@ -12,6 +12,12 @@ function openDetail(review) {
   const progress = isProgress(review);
   const cat      = getCleanCat(review);
 
+  /* Colori della categoria della recensione (accent + deep) sul modale */
+  const tok = CAT_TOKENS[cat] || CAT_TOKENS.ALL;
+  modal.style.setProperty("--current-accent", tok.accent);
+  modal.style.setProperty("--detail-bg", tok.deep);
+  modal.style.setProperty("--current-rgb", tok.rgb);
+
   /* Hero: sfondo blurred + poster centrato */
   const heroBg     = document.getElementById("detail-hero-img");
   const heroPoster = document.getElementById("detail-hero-poster");

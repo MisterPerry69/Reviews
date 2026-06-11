@@ -1,5 +1,5 @@
 /* ============================================
-   rank★d — Base · Liquid/Jelly shell
+   rank★d — Base · Soft Pastel shell
    ============================================ */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -8,7 +8,7 @@ html, body {
   height: 100%;
   font-family: var(--font-body);
   background: var(--base);
-  color: var(--text);
+  color: var(--ink);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior: none;
@@ -20,12 +20,12 @@ a { color: inherit; text-decoration: none; }
 img { display: block; }
 
 /* ═════════════════════════════
-   SPLASH — blob pulsante
+   SPLASH
 ═════════════════════════════ */
 .splash {
   position: fixed;
   inset: 0;
-  background: var(--base);
+  background: var(--all-page);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -39,13 +39,12 @@ img { display: block; }
 
 .splash-blob {
   position: absolute;
-  width: 320px;
-  height: 320px;
+  width: 320px; height: 320px;
   border-radius: 45% 55% 52% 48% / 50% 48% 52% 50%;
-  background: radial-gradient(circle at 40% 35%, var(--cat-film), var(--cat-comic));
-  filter: blur(50px);
-  opacity: 0.5;
-  animation: blobMorph 6s ease-in-out infinite;
+  background: radial-gradient(circle at 40% 35%, var(--film-accent), var(--comic-accent));
+  filter: blur(60px);
+  opacity: 0.35;
+  animation: blobMorph 7s ease-in-out infinite;
 }
 @keyframes blobMorph {
   0%, 100% { border-radius: 45% 55% 52% 48% / 50% 48% 52% 50%; transform: rotate(0deg) scale(1); }
@@ -54,10 +53,8 @@ img { display: block; }
 }
 
 .splash-logo {
-  width: 150px;
-  height: auto;
-  position: relative;
-  z-index: 2;
+  width: 150px; height: auto;
+  position: relative; z-index: 2;
   animation: logoPop 0.7s var(--ease-jelly) both;
 }
 @keyframes logoPop {
@@ -65,27 +62,22 @@ img { display: block; }
   to   { transform: scale(1);   opacity: 1; }
 }
 
-.splash-dots {
-  display: flex;
-  gap: 8px;
-  position: relative;
-  z-index: 2;
-}
+.splash-dots { display: flex; gap: 8px; position: relative; z-index: 2; }
 .splash-dots span {
   width: 9px; height: 9px;
   border-radius: 50%;
-  background: var(--text-faint);
+  background: var(--ink-faint);
   animation: dotBounce 1.2s var(--ease-jelly) infinite;
 }
 .splash-dots span:nth-child(2) { animation-delay: 0.16s; }
 .splash-dots span:nth-child(3) { animation-delay: 0.32s; }
 @keyframes dotBounce {
-  0%, 60%, 100% { transform: translateY(0);    background: var(--text-faint); }
-  30%           { transform: translateY(-10px); background: var(--cat-film); }
+  0%, 60%, 100% { transform: translateY(0);    background: var(--ink-faint); }
+  30%           { transform: translateY(-10px); background: var(--film-accent); }
 }
 
 /* ═════════════════════════════
-   APP SHELL
+   APP SHELL — tutto fluisce nel pastello
 ═════════════════════════════ */
 #app {
   width: 100%;
@@ -96,154 +88,136 @@ img { display: block; }
   flex-direction: column;
   overflow: hidden;
   position: relative;
+  background: var(--base);
 }
 #app.hidden { display: none; }
 
+/* Altezze delle barre flottanti (header + pillola) per il padding lista */
+:root {
+  --header-h: calc(env(safe-area-inset-top, 0px) + 58px);
+  --tabs-band: 56px;     /* altezza pillola + margine */
+}
+
 /* ═════════════════════════════
-   HEADER
+   HEADER — flottante in cima, sopra il colore che scorre
 ═════════════════════════════ */
 .app-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: calc(env(safe-area-inset-top, 0px) + 16px) 18px 12px;
-  flex-shrink: 0;
-  position: relative;
   z-index: 30;
-  background: var(--base);
+  background: transparent;
+  pointer-events: none;     /* solo i bottoni cliccabili */
 }
-
+.app-header > * { pointer-events: auto; }
 .header-logo { height: 30px; width: auto; }
-
 .header-actions { display: flex; align-items: center; gap: 4px; }
 
 .header-icon-btn {
   width: 40px; height: 40px;
   border-radius: var(--r-pill);
-  display: grid;
-  place-items: center;
-  color: var(--text-faint);
+  display: grid; place-items: center;
+  color: var(--ink-dim);
   transition: color 0.2s ease, background 0.3s var(--ease-jelly), transform 0.2s var(--ease-jelly);
 }
 .header-icon-btn:active { transform: scale(0.85); }
 .header-icon-btn.active {
   color: #fff;
-  background: var(--current);
-  box-shadow: 0 4px 14px -2px rgba(var(--current-rgb), 0.55);
+  background: var(--current-accent);
+  box-shadow: var(--sh-soft);
 }
 .header-icon-btn svg { width: 20px; height: 20px; stroke-width: 2; }
 
 /* ═════════════════════════════
-   CATEGORY TABS — pill scorrevole jelly
+   ICONE CATEGORIA — pillola trasparente flottante sul colore
 ═════════════════════════════ */
 .cat-tabs {
+  position: absolute;
+  top: var(--header-h);
+  left: 16px; right: 16px;
   display: flex;
   align-items: center;
-  padding: 6px;
-  margin: 0 16px 10px;
-  flex-shrink: 0;
-  position: relative;
-  z-index: 20;
-  background: var(--surface);
+  height: 46px;
+  padding: 0 6px;
+  z-index: 25;
+  background: rgba(255,255,255,0.34);
   border-radius: var(--r-pill);
 }
-
-/* La pill che scivola — un solo elemento, posizionato via JS */
-.tab-indicator {
-  position: absolute;
-  top: 6px;
-  left: 6px;
-  height: calc(100% - 12px);
-  border-radius: var(--r-pill);
-  background: var(--current);
-  box-shadow: 0 6px 18px -4px rgba(var(--current-rgb), 0.6);
-  transition:
-    transform 0.55s var(--ease-jelly),
-    width 0.45s var(--ease-jelly),
-    background 0.4s ease;
-  z-index: 0;
-  pointer-events: none;
-}
-
 .cat-tab {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 11px 0;
-  position: relative;
-  z-index: 1;
-  transition: transform 0.3s var(--ease-jelly);
+  height: 100%;
+  transition: transform 0.25s var(--ease-jelly);
 }
-.cat-tab:active { transform: scale(0.88); }
-
-.cat-tab-icon {
-  width: 22px; height: 22px;
-  transition: stroke 0.25s ease, fill 0.25s ease, transform 0.4s var(--ease-jelly);
-}
-/* default inattivo */
-.cat-tab .cat-tab-icon         { fill: var(--text-faint); }
-.cat-tab .cat-tab-icon.stroke  { fill: none; stroke: var(--text-faint); }
-/* attivo → bianco dentro la pill */
-.cat-tab.active .cat-tab-icon         { fill: #fff; transform: scale(1.08); }
-.cat-tab.active .cat-tab-icon.stroke  { fill: none; stroke: #fff; }
+.cat-tab:active { transform: scale(0.85); }
+.cat-tab-icon { width: 22px; height: 22px; transition: fill 0.3s ease, stroke 0.3s ease, transform 0.3s var(--ease-jelly); }
+.cat-tab .cat-tab-icon        { fill: rgba(42,38,34,0.4); }
+.cat-tab .cat-tab-icon.stroke { fill: none; stroke: rgba(42,38,34,0.4); }
+.cat-tab.active .cat-tab-icon        { fill: var(--current-accent); transform: scale(1.1); }
+.cat-tab.active .cat-tab-icon.stroke { fill: none; stroke: var(--current-accent); }
 
 /* ═════════════════════════════
-   LIST AREA + flood a tendina
+   DECK — riempie TUTTO #app (dietro header+pillola).
+   La folder che scorre è l'unico blocco colorato: pagina completa.
 ═════════════════════════════ */
-.list-area {
-  flex: 1;
+.cat-deck {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--base);
+  z-index: 1;
+}
+
+.folder-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  width: 500%;
+  will-change: transform;
+  pointer-events: none;
+}
+.folder {
+  width: 20%;
+  height: 100%;
+  flex-shrink: 0;
+  background: var(--folder-page);   /* colore PIENO da cima a fondo */
+}
+
+/* lista card: scrolla, con padding per stare sotto header+pillola.
+   trasla orizzontalmente durante lo swipe (le card escono col colore). */
+.list-scroll {
+  position: absolute;
+  inset: 0;
+  padding-top: calc(var(--header-h) + var(--tabs-band));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  background-color: var(--current-bg);
-  transition: background-color 0.5s var(--ease-smooth);
-  position: relative;
-}
-.list-area::-webkit-scrollbar { display: none; }
-
-/* Il velo che entra di lato col nuovo colore */
-.flood-veil {
-  position: fixed;
-  inset: 0;
   z-index: 5;
-  pointer-events: none;
-  opacity: 0;
+  will-change: transform;
 }
-.flood-veil.flood-from-right {
-  background: var(--flood-color);
-  animation: floodRight 0.55s var(--ease-out) forwards;
-}
-.flood-veil.flood-from-left {
-  background: var(--flood-color);
-  animation: floodLeft 0.55s var(--ease-out) forwards;
-}
-@keyframes floodRight {
-  0%   { opacity: 1; clip-path: inset(0 0 0 100%); }
-  55%  { opacity: 1; clip-path: inset(0 0 0 0%); }
-  100% { opacity: 0; clip-path: inset(0 0 0 0%); }
-}
-@keyframes floodLeft {
-  0%   { opacity: 1; clip-path: inset(0 100% 0 0); }
-  55%  { opacity: 1; clip-path: inset(0 0% 0 0); }
-  100% { opacity: 0; clip-path: inset(0 0% 0 0); }
-}
+.list-scroll::-webkit-scrollbar { display: none; }
 
 /* ═════════════════════════════
    STATS VIEW
 ═════════════════════════════ */
 .stats-view {
-  flex: 1;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
   overflow-y: auto;
   scrollbar-width: none;
-  background-color: var(--current-bg);
-  transition: background-color 0.5s var(--ease-smooth);
+  background: var(--current-page);
 }
 .stats-view::-webkit-scrollbar { display: none; }
 .stats-view.hidden { display: none; }
 
 .stats-scroll {
-  padding: 18px 16px calc(env(safe-area-inset-bottom,0px) + 100px);
+  padding: calc(var(--header-h) + 8px) 16px calc(env(safe-area-inset-bottom,0px) + 90px);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -253,16 +227,17 @@ img { display: block; }
   display: grid;
   grid-template-columns: repeat(4,1fr);
   gap: 8px;
-  background: var(--surface);
+  background: var(--current-card);
   border-radius: var(--r-lg);
   padding: 20px 10px;
+  box-shadow: var(--sh-card);
 }
 .stats-hero-item { text-align: center; }
 .stats-hero-num {
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.9rem;
-  color: var(--current);
+  color: var(--current-accent);
   line-height: 1;
   transition: color 0.4s ease;
 }
@@ -271,82 +246,99 @@ img { display: block; }
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-faint);
+  color: var(--ink-faint);
   margin-top: 5px;
 }
 
 .stats-card {
-  background: var(--surface);
+  background: var(--current-card);
   border-radius: var(--r-lg);
   padding: 18px;
+  box-shadow: var(--sh-card);
 }
 .stats-section-label {
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.95rem;
-  letter-spacing: 0.02em;
-  color: var(--text-dim);
+  color: var(--ink-dim);
   margin-bottom: 12px;
 }
 
 /* ═════════════════════════════
-   FAB — bolla galleggiante
+   FAB — mezzo dentro/mezzo fuori
 ═════════════════════════════ */
 .fab {
   position: absolute;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+  bottom: -28px;                 /* metà nascosto sotto al bordo */
   left: 50%;
-  margin-left: -31px;
-  width: 62px; height: 62px;
+  margin-left: -34px;
+  width: 68px; height: 68px;
   border-radius: 50%;
-  background: var(--current);
+  background: var(--current-accent);
   color: #fff;
   display: grid;
   place-items: center;
   z-index: 40;
-  box-shadow: 0 10px 28px -6px rgba(var(--current-rgb), 0.7),
-              0 4px 10px rgba(0,0,0,0.3);
-  transition: background 0.4s ease, transform 0.3s var(--ease-jelly), box-shadow 0.4s ease;
-  animation: fabBob 3.5s ease-in-out infinite;
+  box-shadow: var(--sh-fab);     /* ombra nera morbida, NO glow */
+  transition: background 0.4s ease, transform 0.35s var(--ease-jelly), bottom 0.35s var(--ease-jelly);
 }
-@keyframes fabBob {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-5px); }
+.fab .fab-star {
+  font-size: 1.5rem;
+  line-height: 1;
+  transform: translateY(-6px);   /* spinge la stella nella metà visibile */
+  transition: transform 0.35s var(--ease-jelly);
 }
-.fab:active {
-  transform: scale(0.86);
-  animation: none;
+/* hover/focus: sale e si centra */
+.fab:hover { bottom: 16px; }
+.fab:hover .fab-star { transform: translateY(0); }
+/* lancio: salta su prima di aprire la modale (toggle da JS) */
+.fab.launching {
+  animation: fabLaunch 0.4s var(--ease-jelly);
 }
-.fab svg { width: 26px; height: 26px; stroke-width: 2.6; }
+@keyframes fabLaunch {
+  0%   { bottom: -28px; transform: scale(1); }
+  45%  { bottom: 30px;  transform: scale(1.12); }
+  100% { bottom: 16px;  transform: scale(1); }
+}
 
 /* ═════════════════════════════
-   STARS
+   STARS (SVG: piena / mezza / vuota)
 ═════════════════════════════ */
 .stars {
-  letter-spacing: 1px;
-  color: var(--current);
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--current-accent);
   transition: color 0.4s ease;
+  line-height: 0;
 }
-.stars .half  { opacity: 0.5; }
-.stars .empty { opacity: 0.16; }
+.stars .star {
+  width: 1em;
+  height: 1em;
+  flex-shrink: 0;
+}
+.stars .star.full path { fill: currentColor; }
+.stars .star.empty path { fill: none; stroke: currentColor; stroke-width: 1.6; opacity: 0.3; }
+.stars .star.half .star-fill    { /* gradiente già applicato inline */ }
+.stars .star.half .star-outline { fill: none; stroke: currentColor; stroke-width: 1.6; opacity: 0.55; }
 
 /* ═════════════════════════════
    CAT BADGE
 ═════════════════════════════ */
 .cat-badge {
   display: inline-block;
-  padding: 3px 10px;
+  padding: 4px 13px;
   border-radius: var(--r-pill);
-  font-size: 0.58rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: rgba(255,255,255,0.1);
-  color: var(--current);
-  transition: color 0.4s ease;
+  background: rgba(var(--current-rgb), 0.14);
+  color: var(--current-accent);
+  transition: color 0.4s ease, background 0.4s ease;
 }
-.cat-badge.wish     { background: rgba(176,107,255,0.2); color: var(--cat-comic); }
-.cat-badge.progress { background: rgba(43,213,118,0.2);  color: var(--cat-game); }
+.cat-badge.wish     { background: rgba(131,56,214,0.14); color: var(--comic-accent); }
+.cat-badge.progress { background: rgba(42,154,78,0.14);  color: var(--game-accent); }
 
 /* ═════════════════════════════
    EMPTY STATE
@@ -354,20 +346,20 @@ img { display: block; }
 .empty-state {
   text-align: center;
   padding: 70px 24px;
-  color: var(--text-faint);
-  font-size: 0.9rem;
+  color: var(--ink-faint);
+  font-size: 0.95rem;
   font-weight: 500;
 }
 
 /* ═════════════════════════════
-   MODAL OVERLAY
+   MODAL OVERLAY (chiaro)
 ═════════════════════════════ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(40,30,15,0.4);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: 500;
   display: flex;
   align-items: flex-end;
@@ -378,15 +370,13 @@ img { display: block; }
 .modal-overlay.hidden { display: none; }
 
 .modal-box {
-  background: var(--base-2);
+  background: var(--current-card);
   border-radius: var(--r-xl) var(--r-xl) 0 0;
   width: 100%;
   max-width: 440px;
   max-height: 92dvh;
   overflow-y: auto;
   scrollbar-width: none;
-  border: 1px solid var(--border-soft);
-  border-bottom: none;
   animation: sheetUp 0.42s var(--ease-out);
 }
 .modal-box::-webkit-scrollbar { display: none; }
@@ -405,16 +395,15 @@ img { display: block; }
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.5rem;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .icon-btn {
   width: 36px; height: 36px;
   border-radius: var(--r-pill);
-  background: var(--surface);
-  display: grid;
-  place-items: center;
-  color: var(--text-dim);
+  background: rgba(42,38,34,0.07);
+  display: grid; place-items: center;
+  color: var(--ink-dim);
   transition: background 0.2s ease, transform 0.2s var(--ease-jelly);
 }
 .icon-btn:active { transform: scale(0.85); }
@@ -425,8 +414,8 @@ img { display: block; }
 ═════════════════════════════ */
 .spinner {
   width: 20px; height: 20px;
-  border: 2.5px solid var(--border-soft);
-  border-top-color: var(--current);
+  border: 2.5px solid rgba(42,38,34,0.15);
+  border-top-color: var(--current-accent);
   border-radius: 50%;
   animation: spin 0.6s linear infinite;
   transition: border-top-color 0.4s ease;

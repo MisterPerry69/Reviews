@@ -1,12 +1,12 @@
 /* ============================================
-   rank★d — Entry modal · Jelly
+   rank★d — Entry modal · Soft Pastel
    ============================================ */
 
 .entry-body { padding: 18px 22px; }
 
 .entry-hint {
-  font-size: 0.78rem;
-  color: var(--text-faint);
+  font-size: 0.8rem;
+  color: var(--ink-dim);
   line-height: 1.55;
   margin-bottom: 14px;
 }
@@ -14,22 +14,22 @@
 .entry-textarea {
   width: 100%;
   min-height: 140px;
-  background: var(--surface);
+  background: rgba(42,38,34,0.05);
   border: 2px solid transparent;
   border-radius: var(--r);
   padding: 14px 16px;
   font-family: var(--font-body);
   font-size: 0.95rem;
-  color: var(--text);
+  color: var(--ink);
   resize: none;
   line-height: 1.6;
   transition: border-color 0.25s ease, background 0.2s ease;
 }
-.entry-textarea::placeholder { color: rgba(255,255,255,0.24); }
+.entry-textarea::placeholder { color: var(--ink-faint); }
 .entry-textarea:focus {
   outline: none;
-  border-color: var(--current);
-  background: rgba(255,255,255,0.04);
+  border-color: var(--current-accent);
+  background: rgba(42,38,34,0.03);
 }
 
 .entry-footer {
@@ -41,22 +41,22 @@
 .btn-entry-cancel {
   flex: 0 0 auto;
   padding: 14px 20px;
-  background: var(--surface);
+  background: rgba(42,38,34,0.06);
   border-radius: var(--r-pill);
   font-family: var(--font-display);
   font-weight: 500;
   font-size: 0.95rem;
-  color: var(--text-dim);
+  color: var(--ink-dim);
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s var(--ease-jelly);
 }
 .btn-entry-cancel:active { transform: scale(0.92); }
-.btn-entry-cancel:hover  { background: var(--surface-raised); color: var(--text); }
+.btn-entry-cancel:hover  { background: rgba(42,38,34,0.1); color: var(--ink); }
 
 .btn-entry-submit {
   flex: 1;
   padding: 14px 0;
-  background: var(--current);
+  background: var(--current-accent);
   border-radius: var(--r-pill);
   font-family: var(--font-display);
   font-weight: 600;
@@ -67,26 +67,27 @@
   align-items: center;
   justify-content: center;
   gap: 9px;
-  box-shadow: 0 6px 18px -4px rgba(var(--current-rgb), 0.6);
-  transition: background 0.4s ease, transform 0.2s var(--ease-jelly), box-shadow 0.3s ease;
+  box-shadow: var(--sh-soft);   /* ombra nera morbida, NO glow */
+  transition: background 0.4s ease, transform 0.2s var(--ease-jelly);
 }
 .btn-entry-submit:active   { transform: scale(0.95); }
 .btn-entry-submit:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
 .btn-entry-submit svg { width: 17px; height: 17px; stroke-width: 2.2; }
 
 .entry-loading-card {
-  background: var(--surface);
+  background: var(--current-card);
   border-radius: var(--r-lg);
   padding: 18px 20px;
   display: flex;
   align-items: center;
   gap: 16px;
   margin: 0 16px;
+  box-shadow: var(--sh-card);
   animation: cardDrop 0.45s var(--ease-jelly) both;
 }
 
 .entry-loading-text {
-  font-size: 0.82rem;
-  color: var(--text-dim);
+  font-size: 0.84rem;
+  color: var(--ink-dim);
   font-weight: 500;
 }

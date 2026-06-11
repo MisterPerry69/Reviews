@@ -1,22 +1,33 @@
 /* ============================================
-   rank★d — Init, navigazione, animazioni
+   rank★d — Init, cartellina carosello, utils
    ============================================ */
 
 const CAT_EMOJI = { FILM: "🎬", SERIE: "📺", GAME: "🎮", COMIC: "📚" };
 
-/* accent + bg flood + rgb (per le ombre) di ogni categoria */
+/* page (pastello cartella), accent (saturo), card (crema), deep (scuro per il dettaglio), rgb */
 const CAT_TOKENS = {
-  ALL:   { accent: "#ffb627", bg: "#221c10", rgb: "255,182,39"  },
-  FILM:  { accent: "#ff6b35", bg: "#2a1006", rgb: "255,107,53"  },
-  SERIE: { accent: "#4d96ff", bg: "#08152e", rgb: "77,150,255"  },
-  GAME:  { accent: "#2bd576", bg: "#06241a", rgb: "43,213,118"  },
-  COMIC: { accent: "#b06bff", bg: "#1c0a2e", rgb: "176,107,255" },
+  ALL:   { page: "#f4e2b6", accent: "#d9871b", card: "#fdf7ea", deep: "#2a2113", rgb: "217,135,27"  },
+  FILM:  { page: "#f7ccac", accent: "#e1561f", card: "#fdf2e9", deep: "#2c170d", rgb: "225,86,31"   },
+  SERIE: { page: "#c2d8f0", accent: "#2767ce", card: "#eff5fc", deep: "#101f33", rgb: "39,103,206"  },
+  GAME:  { page: "#c3e1bd", accent: "#2a9a4e", card: "#eff7ed", deep: "#13261a", rgb: "42,154,78"   },
+  COMIC: { page: "#ddc8ee", accent: "#8338d6", card: "#f6eefc", deep: "#211433", rgb: "131,56,214"  },
 };
 
 const CATS = ["ALL", "FILM", "SERIE", "GAME", "COMIC"];
 
+/* Icone tab (SVG inline) */
+const CAT_ICONS = {
+  ALL:   `<svg class="cat-tab-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><circle cx="6.5" cy="6.5" r="3"/><circle cx="17.5" cy="6.5" r="3"/><circle cx="6.5" cy="17.5" r="3"/><circle cx="17.5" cy="17.5" r="3"/></svg>`,
+  FILM:  `<svg class="cat-tab-icon stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="5" width="19" height="14" rx="3"/><line x1="7" y1="5" x2="7" y2="19"/><line x1="17" y1="5" x2="17" y2="19"/><line x1="2.5" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21.5" y2="12"/></svg>`,
+  SERIE: `<svg class="cat-tab-icon stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="4.5" width="19" height="13" rx="3"/><path d="M8.5 21h7"/><path d="M12 17.5V21"/></svg>`,
+  GAME:  `<svg class="cat-tab-icon stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M17 5.5H7A5 5 0 0 0 2 10.5v3a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5v-3a5 5 0 0 0-5-5z"/><line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/><circle cx="15.5" cy="11" r="1" fill="currentColor" stroke="none"/><circle cx="18" cy="13.5" r="1" fill="currentColor" stroke="none"/></svg>`,
+  COMIC: `<svg class="cat-tab-icon stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H19v15.5H7.5A2.5 2.5 0 0 0 5 20V4.5z"/><path d="M5 17.5A2.5 2.5 0 0 1 7.5 20H19"/></svg>`,
+};
+
 let _currentCat   = "ALL";
+let _currentIdx   = 0;
 let _currentState = "reviews";
+let _dragAccentCat = "ALL";
 
 /* ── Helpers ── */
 function escapeHtml(str) {
@@ -30,14 +41,27 @@ function getCleanCat(r) {
 function isWish(r)     { return (r.categoria || "").toUpperCase().includes("WISH"); }
 function isProgress(r) { return (r.categoria || "").toUpperCase().includes("IN_PROGRESS"); }
 
-function renderStars(rating) {
-  const full  = Math.floor(rating);
-  const half  = rating % 1 >= 0.5 ? 1 : 0;
-  const empty = 5 - full - half;
-  return "★".repeat(full) +
-    (half ? '<span class="half">½</span>' : "") +
-    '<span class="empty">' + "★".repeat(empty) + "</span>";
+/* Stelle SVG: piena / mezza / vuota */
+function _starSvg(kind) {
+  const path = "M12 2.4l2.96 6 6.62.96-4.79 4.67 1.13 6.59L12 17.5 6.08 20.62l1.13-6.59L2.42 9.36 9.04 8.4 12 2.4z";
+  if (kind === "full") return `<svg class="star full" viewBox="0 0 24 24" aria-hidden="true"><path d="${path}"/></svg>`;
+  if (kind === "half") {
+    const id = "hg" + Math.random().toString(36).slice(2, 8);
+    return `<svg class="star half" viewBox="0 0 24 24" aria-hidden="true"><defs><linearGradient id="${id}"><stop offset="50%" stop-color="currentColor"/><stop offset="50%" stop-color="transparent"/></linearGradient></defs><path d="${path}" fill="url(#${id})"/><path d="${path}" class="star-outline"/></svg>`;
+  }
+  return `<svg class="star empty" viewBox="0 0 24 24" aria-hidden="true"><path d="${path}"/></svg>`;
 }
+function renderStars(rating) {
+  const full = Math.floor(rating);
+  const half = rating % 1 >= 0.5 ? 1 : 0;
+  const empty = 5 - full - half;
+  let out = "";
+  for (let i = 0; i < full; i++)  out += _starSvg("full");
+  if (half)                       out += _starSvg("half");
+  for (let i = 0; i < empty; i++) out += _starSvg("empty");
+  return out;
+}
+
 function formatDate(dateStr) {
   if (!dateStr) return "";
   const p = dateStr.split("-");
@@ -46,67 +70,183 @@ function formatDate(dateStr) {
   return p[2] + " " + (m[parseInt(p[1], 10) - 1] || p[1]);
 }
 
-/* ── Applica colori categoria su :root ── */
+/* ── Applica accent/card correnti su :root (per stelle, badge, FAB, modali) ── */
 function _applyTokens(cat) {
   const t = CAT_TOKENS[cat] || CAT_TOKENS.ALL;
   const s = document.documentElement.style;
-  s.setProperty("--current",     t.accent);
-  s.setProperty("--current-bg",  t.bg);
-  s.setProperty("--current-rgb", t.rgb);
+  s.setProperty("--current-page",   t.page);
+  s.setProperty("--current-accent", t.accent);
+  s.setProperty("--current-card",   t.card);
+  s.setProperty("--current-rgb",    t.rgb);
 }
 
-/* ── Posiziona la pill scorrevole sotto la tab attiva ── */
-function _movePill(animate) {
-  const tabs = document.getElementById("cat-tabs");
-  const pill = document.getElementById("tab-indicator");
-  const active = tabs.querySelector(".cat-tab.active");
-  if (!active || !pill) return;
 
-  // primo posizionamento senza transizione (evita lo "scivolone" da 0)
-  if (!animate) {
-    const prev = pill.style.transition;
-    pill.style.transition = "none";
-    pill.style.width = active.offsetWidth + "px";
-    pill.style.transform = `translateX(${active.offsetLeft - 6}px)`;
-    void pill.offsetWidth;
-    pill.style.transition = prev;
+/* ── Icone categoria FISSE (una riga sola, non scorre) ── */
+function _buildTabs() {
+  const nav = document.getElementById("cat-tabs");
+  nav.querySelectorAll(".cat-tab").forEach(btn => {
+    btn.innerHTML = CAT_ICONS[btn.dataset.cat];
+    btn.addEventListener("click", () => setCategory(btn.dataset.cat));
+  });
+}
+function _markActiveTab(cat) {
+  document.querySelectorAll("#cat-tabs .cat-tab").forEach(b =>
+    b.classList.toggle("active", b.dataset.cat === cat));
+}
+
+/* ════════════════════════════════
+   CARTELLE — blocco colorato pieno (angoli arrotondati in alto).
+   5 cartelle affiancate in #folder-track (width 500%); scorrono col swipe.
+════════════════════════════════ */
+function _buildFolders() {
+  const track = document.getElementById("folder-track");
+  track.innerHTML = CATS.map(cat =>
+    `<div class="folder" data-cat="${cat}" style="--folder-page:${CAT_TOKENS[cat].page}"></div>`
+  ).join("");
+}
+
+/* ── Posiziona il track all'indice (frazionario durante drag) ── */
+function _positionTrack(idxFloat) {
+  const track = document.getElementById("folder-track");
+  track.style.transform = `translateX(${-idxFloat * 20}%)`;
+}
+
+/* ════════════════════════════════
+   DRAG — tutta la cartellina scorre (tab-row + pannello insieme).
+════════════════════════════════ */
+function _initCarousel() {
+  const deck = document.getElementById("cat-deck");
+  const track = document.getElementById("folder-track");
+  const listScroll = document.getElementById("list-scroll");
+
+  let startX = 0, startY = 0;
+  let dragging = false, decided = false, horizontal = false;
+  let deckW = deck.offsetWidth;
+
+  function onStart(e) {
+    if (_currentState === "stats") return;
+    const t = e.touches ? e.touches[0] : e;
+    startX = t.clientX; startY = t.clientY;
+    deckW = deck.offsetWidth;
+    dragging = true; decided = false; horizontal = false;
+    _dragAccentCat = _currentCat;
+    track.style.transition = "none";
+    listScroll.style.transition = "none";
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const t = e.touches ? e.touches[0] : e;
+    const dx = t.clientX - startX;
+    const dy = t.clientY - startY;
+
+    if (!decided) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      horizontal = Math.abs(dx) > Math.abs(dy);
+      decided = true;
+    }
+    if (!horizontal) return;
+    e.preventDefault && e.preventDefault();
+
+    let eff = dx;
+    const atStart = _currentIdx === 0 && dx > 0;
+    const atEnd   = _currentIdx === CATS.length - 1 && dx < 0;
+    if (atStart || atEnd) eff = dx * 0.32;
+
+    const frac = -eff / deckW;
+    let idxFloat = Math.max(0, Math.min(CATS.length - 1, _currentIdx + frac));
+    _positionTrack(idxFloat);
+
+    // le card scorrono via insieme al dito (non in fade)
+    listScroll.style.transform = `translateX(${eff}px)`;
+
+    // accent della pillola/header segue la categoria più vicina mentre trascini
+    const nearest = Math.round(idxFloat);
+    if (CATS[nearest] !== _dragAccentCat) {
+      _dragAccentCat = CATS[nearest];
+      const tk = CAT_TOKENS[_dragAccentCat];
+      const s = document.documentElement.style;
+      s.setProperty("--current-accent", tk.accent);
+      s.setProperty("--current-rgb", tk.rgb);
+      _markActiveTab(_dragAccentCat);
+    }
+  }
+
+  function onEnd(e) {
+    if (!dragging) return;
+    dragging = false;
+    if (!horizontal) { listScroll.style.transform = ""; return; }
+
+    const t = e.changedTouches ? e.changedTouches[0] : e;
+    const dx = t.clientX - startX;
+    const threshold = deckW * 0.20;
+
+    let target = _currentIdx;
+    if (dx < -threshold && _currentIdx < CATS.length - 1) target = _currentIdx + 1;
+    else if (dx > threshold && _currentIdx > 0)           target = _currentIdx - 1;
+
+    _snapTo(target, dx < 0 ? 1 : -1);
+  }
+
+  deck.addEventListener("touchstart", onStart, { passive: true });
+  deck.addEventListener("touchmove",  onMove,  { passive: false });
+  deck.addEventListener("touchend",   onEnd,   { passive: true });
+}
+
+/* ── Snap: il colore rimbalza; le card vecchie escono di lato, poi le nuove entrano a cascata ── */
+function _snapTo(idx, dir) {
+  const track = document.getElementById("folder-track");
+  const listScroll = document.getElementById("list-scroll");
+  const changed = idx !== _currentIdx;
+  const w = document.getElementById("cat-deck").offsetWidth;
+
+  track.style.transition = "transform 0.5s cubic-bezier(0.34,1.56,0.64,1)";
+  _currentIdx = idx;
+  _currentCat = CATS[idx];
+  _positionTrack(idx);
+  _markActiveTab(_currentCat);
+  _applyTokens(_currentCat);
+
+  if (!changed) {
+    // torna in posizione con un piccolo rimbalzo
+    listScroll.style.transition = "transform 0.4s cubic-bezier(0.34,1.56,0.64,1)";
+    listScroll.style.transform = "translateX(0)";
     return;
   }
 
-  pill.style.width = active.offsetWidth + "px";
-  pill.style.transform = `translateX(${active.offsetLeft - 6}px)`;
+  // direzione di uscita = verso dove ho swipato
+  const outX = (dir > 0 ? -1 : 1) * w;
+  listScroll.style.transition = "transform 0.26s ease-in";
+  listScroll.style.transform = `translateX(${outX}px)`;
+
+  setTimeout(() => {
+    // render nuove card, posizionate fuori dal lato opposto, pronte a entrare
+    if (typeof _render === "function") _render(false);
+    listScroll.style.transition = "none";
+    listScroll.style.transform = `translateX(${-outX}px)`;
+    void listScroll.offsetWidth;
+    // rientro con bounce + cascata
+    listScroll.style.transition = "transform 0.5s cubic-bezier(0.34,1.56,0.64,1)";
+    listScroll.style.transform = "translateX(0)";
+    _triggerCascade();
+  }, 260);
 }
 
-/* ── Flood a tendina dal lato del cambio ── */
-function _playFlood(toCat, direction) {
-  const veil = document.getElementById("flood-veil");
-  const t = CAT_TOKENS[toCat] || CAT_TOKENS.ALL;
-  veil.style.setProperty("--flood-color", t.bg);
-
-  veil.classList.remove("flood-from-left", "flood-from-right");
-  void veil.offsetWidth;
-  veil.classList.add(direction > 0 ? "flood-from-right" : "flood-from-left");
+/* riattiva l'animazione a cascata delle card */
+function _triggerCascade() {
+  const list = document.getElementById("reviews-list");
+  if (!list) return;
+  list.classList.remove("animate-in");
+  void list.offsetWidth;
+  list.classList.add("animate-in");
 }
 
-/* ── Cambio categoria (con flood + stagger) ── */
-function setCategory(cat, direction) {
-  if (cat === _currentCat) return;
-
-  const prevIdx = CATS.indexOf(_currentCat);
-  const newIdx  = CATS.indexOf(cat);
-  const dir = typeof direction === "number" ? direction : (newIdx > prevIdx ? 1 : -1);
-
-  _currentCat = cat;
-
-  document.querySelectorAll(".cat-tab").forEach(b =>
-    b.classList.toggle("active", b.dataset.cat === cat));
-
-  _applyTokens(cat);
-  _movePill(true);
-  _playFlood(cat, dir);
-
-  // attendi metà flood, poi swappa il contenuto sotto il velo
-  setTimeout(() => { if (typeof _render === "function") _render(true); }, 230);
+/* ── Cambio da tap su tab ── */
+function setCategory(cat) {
+  const idx = CATS.indexOf(cat);
+  if (idx < 0) return;
+  const dir = idx > _currentIdx ? 1 : -1;   // direzione coerente con la posizione
+  _snapTo(idx, dir);
 }
 
 /* ── Icone header: stato ── */
@@ -115,62 +255,48 @@ function setHeaderState(state) {
   document.querySelectorAll(".header-icon-btn").forEach(b =>
     b.classList.toggle("active", b.dataset.state === state));
 
-  const listArea  = document.getElementById("list-area");
+  const deck = document.getElementById("cat-deck");
   const statsView = document.getElementById("stats-view");
+  const tabs = document.getElementById("cat-tabs");
 
   if (state === "stats") {
-    listArea.classList.add("hidden");
+    deck.classList.add("hidden");
     statsView.classList.remove("hidden");
+    tabs.classList.add("hidden");            // nascondi pillola categorie in stats
     if (typeof renderStats === "function") renderStats(window._allReviewsCache || []);
   } else {
     statsView.classList.add("hidden");
-    listArea.classList.remove("hidden");
+    deck.classList.remove("hidden");
+    tabs.classList.remove("hidden");
     if (typeof _render === "function") _render(true);
   }
 }
 
-/* ── Swipe ── */
-function _initSwipe() {
-  const area = document.getElementById("list-area");
-  let startX = 0, startY = 0, tracking = false;
-
-  area.addEventListener("touchstart", e => {
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    tracking = true;
-  }, { passive: true });
-
-  area.addEventListener("touchend", e => {
-    if (!tracking) return;
-    tracking = false;
-    const dx = e.changedTouches[0].clientX - startX;
-    const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    if (Math.abs(dx) > 55 && dy < 50) {
-      const idx = CATS.indexOf(_currentCat);
-      if (dx < 0 && idx < CATS.length - 1) setCategory(CATS[idx + 1], 1);
-      if (dx > 0 && idx > 0)               setCategory(CATS[idx - 1], -1);
-    }
-  }, { passive: true });
+/* ── FAB launch ── */
+function _launchFab() {
+  const fab = document.getElementById("fab-new");
+  fab.classList.remove("launching");
+  void fab.offsetWidth;
+  fab.classList.add("launching");
+  setTimeout(() => openEntry(), 260);
+  setTimeout(() => fab.classList.remove("launching"), 420);
 }
 
-/* ── Splash ── */
+/* ════════════════════════════════ BOOT ════════════════════════════════ */
 document.addEventListener("DOMContentLoaded", async () => {
   _applyTokens("ALL");
+  _buildTabs();
+  _buildFolders();
+  _markActiveTab("ALL");
 
-  document.querySelectorAll(".cat-tab").forEach(btn => {
-    btn.addEventListener("click", () => setCategory(btn.dataset.cat));
-  });
   document.querySelectorAll(".header-icon-btn").forEach(btn => {
     btn.addEventListener("click", () => setHeaderState(btn.dataset.state));
   });
-  document.getElementById("fab-new").addEventListener("click", () => openEntry());
+  document.getElementById("fab-new").addEventListener("click", _launchFab);
 
-  _initSwipe();
-  window.addEventListener("resize", () => _movePill(false));
+  _initCarousel();
 
   await loadAllReviews().catch(() => null);
-
-  // splash min 1.1s per far vedere il blob
   await new Promise(r => setTimeout(r, 1100));
 
   const splash = document.getElementById("splash");
@@ -178,13 +304,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   await new Promise(r => setTimeout(r, 440));
   splash.style.display = "none";
 
-  const app = document.getElementById("app");
-  app.classList.remove("hidden");
+  document.getElementById("app").classList.remove("hidden");
   if (typeof lucide !== "undefined") lucide.createIcons();
 
-  // posiziona la pill ora che il layout è visibile
   requestAnimationFrame(() => {
-    _movePill(false);
+    _positionTrack(_currentIdx);
     if (typeof _render === "function") _render(true);
   });
 });
