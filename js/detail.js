@@ -224,9 +224,10 @@ async function saveEdit() {
     refreshReviews();
   } catch(e) {
     console.error("saveEdit:", e);
+    alert("Errore nel salvataggio: " + e.message);
+  } finally {
     btn.textContent = orig;
     btn.disabled = false;
-    alert("Errore nel salvataggio: " + e.message);
   }
 }
 
@@ -244,10 +245,11 @@ async function regenerateReview() {
     refreshReviews();
   } catch(e) {
     console.error("regenerateReview:", e);
+    alert("Rigenerazione non riuscita: " + e.message);
+  } finally {
     btn.innerHTML = orig;
     btn.disabled = false;
     if (window.lucide) lucide.createIcons();
-    alert("Rigenerazione non riuscita: " + e.message);
   }
 }
 
