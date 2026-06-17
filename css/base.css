@@ -133,6 +133,8 @@ img { display: block; }
   background: rgba(255,255,255,0.34);
   border-radius: var(--r-pill);
 }
+/* Su ALL il page è grigio scuro: menu bianco-card come le card */
+:root[data-cat="ALL"] .cat-tabs { background: var(--all-card); }
 .cat-tab {
   flex: 1;
   display: flex;

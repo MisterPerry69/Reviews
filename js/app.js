@@ -78,6 +78,7 @@ function _applyTokens(cat) {
   s.setProperty("--current-accent", t.accent);
   s.setProperty("--current-card",   t.card);
   s.setProperty("--current-rgb",    t.rgb);
+  document.documentElement.setAttribute("data-cat", cat);
 }
 
 

@@ -1,6 +1,6 @@
 """
-Genera icon-192.png e icon-512.png per Reel (Reviews).
-Stile: pellicola cinematografica su sfondo ambra scuro.
+Genera icon-192.png e icon-512.png per rank★d.
+Stile: stellina ambra centrata su sfondo grigio scuro (#3a3a3c).
 Nessuna dipendenza esterna — solo stdlib Python.
 Run: python gen_icons.py
 """
@@ -27,73 +27,50 @@ def png(width, height, pixels):
     iend = chunk(b"IEND", b"")
     return sig + ihdr + idat + iend
 
+BG    = (58, 58, 60)     # #3a3a3c — grigio scuro app
+AMBER = (224, 160, 80)   # #e0a050 — accento ALL
+
+def _blend(a, b, t):
+    return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+
+def _point_in_star(px, py, cx, cy, r_out, r_in, points=5):
+    """True se (px,py) è dentro la stella a punte (poligono), punta in alto."""
+    verts = []
+    for i in range(points * 2):
+        r = r_out if i % 2 == 0 else r_in
+        ang = -math.pi / 2 + i * math.pi / points
+        verts.append((cx + r * math.cos(ang), cy + r * math.sin(ang)))
+    # point-in-polygon (ray casting)
+    inside = False
+    n = len(verts)
+    j = n - 1
+    for i in range(n):
+        xi, yi = verts[i]; xj, yj = verts[j]
+        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
+            inside = not inside
+        j = i
+    return inside
+
 def draw_icon(size):
-    BG     = (18, 16, 14)       # #12100e — ambra scurissimo
-    AMBER  = (245, 158, 11)     # #f59e0b
-    DARK   = (30, 24, 18)       # bordi pellicola
-    WHITE  = (240, 230, 210)    # perforations
-
     pixels = [[BG] * size for _ in range(size)]
-    cx, cy = size // 2, size // 2
-    r_icon = int(size * 0.42)
+    cx = cy = size / 2.0
+    r_out = size * 0.42
+    r_in  = r_out * 0.40
+    ss = 4  # super-sampling per anti-aliasing
 
-    def set_px(x, y, color):
-        if 0 <= x < size and 0 <= y < size:
-            pixels[y][x] = color
-
-    def fill_rect(x0, y0, x1, y1, color):
-        for y in range(max(0, y0), min(size, y1)):
-            for x in range(max(0, x0), min(size, x1)):
-                pixels[y][x] = color
-
-    def fill_circle(cx, cy, r, color):
-        for y in range(cy - r, cy + r + 1):
-            for x in range(cx - r, cx + r + 1):
-                if (x - cx) ** 2 + (y - cy) ** 2 <= r * r:
-                    set_px(x, y, color)
-
-    # ---- Sfondo circolare ----
-    fill_circle(cx, cy, r_icon, DARK)
-
-    # ---- Film reel (cerchio ambra) ----
-    r_outer = int(r_icon * 0.88)
-    r_inner = int(r_icon * 0.28)
-    for y in range(cy - r_outer, cy + r_outer + 1):
-        for x in range(cx - r_outer, cx + r_outer + 1):
-            d = (x - cx) ** 2 + (y - cy) ** 2
-            if r_inner * r_inner <= d <= r_outer * r_outer:
-                pixels[y][x] = AMBER
-
-    # ---- Fori pellicola (8 fori intorno al mozzo) ----
-    r_holes = int(r_icon * 0.62)
-    hole_r  = int(r_icon * 0.12)
-    for i in range(8):
-        angle = i * math.pi / 4
-        hx = int(cx + r_holes * math.cos(angle))
-        hy = int(cy + r_holes * math.sin(angle))
-        fill_circle(hx, hy, hole_r, DARK)
-
-    # ---- Mozzo centrale ----
-    fill_circle(cx, cy, r_inner, DARK)
-    fill_circle(cx, cy, int(r_inner * 0.55), AMBER)
-
-    # ---- Stella a 5 punte ambra chiaro sopra ----
-    star_r_outer = int(r_icon * 0.18)
-    star_r_inner = int(r_icon * 0.08)
-    star_cx = cx
-    star_cy = int(cy - r_icon * 0.52)
-    for y in range(star_cy - star_r_outer - 1, star_cy + star_r_outer + 2):
-        for x in range(star_cx - star_r_outer - 1, star_cx + star_r_outer + 2):
-            if 0 <= x < size and 0 <= y < size:
-                angle = math.atan2(y - star_cy, x - star_cx) + math.pi / 2
-                sector = (angle % (2 * math.pi / 5))
-                t = sector / (math.pi / 5)
-                if t > 1: t = 2 - t
-                r_boundary = star_r_inner + (star_r_outer - star_r_inner) * t
-                dist = math.sqrt((x - star_cx) ** 2 + (y - star_cy) ** 2)
-                if dist <= r_boundary:
-                    pixels[y][x] = (253, 211, 100)
-
+    y0 = int(cy - r_out - 2); y1 = int(cy + r_out + 2)
+    x0 = int(cx - r_out - 2); x1 = int(cx + r_out + 2)
+    for y in range(max(0, y0), min(size, y1)):
+        for x in range(max(0, x0), min(size, x1)):
+            inside = 0
+            for sy in range(ss):
+                for sx in range(ss):
+                    px = x + (sx + 0.5) / ss
+                    py = y + (sy + 0.5) / ss
+                    if _point_in_star(px, py, cx, cy, r_out, r_in):
+                        inside += 1
+            if inside:
+                pixels[y][x] = _blend(BG, AMBER, inside / (ss * ss))
     return pixels
 
 for size, name in [(192, "icon-192.png"), (512, "icon-512.png")]:

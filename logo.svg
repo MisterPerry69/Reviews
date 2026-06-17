@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 56" width="210" height="56">
-  <style>
-    .word { font-family: 'Fredoka', 'Trebuchet MS', sans-serif; font-weight: 700; }
-  </style>
-  <text x="2" y="40" class="word" font-size="40" fill="#ffffff">rank</text>
-  <text x="108" y="42" font-family="sans-serif" font-size="30" fill="#ff6b35">★</text>
-  <text x="138" y="40" class="word" font-size="40" fill="#ffffff">d</text>
-</svg>
