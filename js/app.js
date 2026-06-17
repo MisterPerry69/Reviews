@@ -6,11 +6,20 @@ const CAT_EMOJI = { FILM: "🎬", SERIE: "📺", GAME: "🎮", COMIC: "📚" };
 
 /* page (pastello cartella), accent (saturo), card (crema), deep (scuro per il dettaglio), rgb */
 const CAT_TOKENS = {
-  ALL:   { page: "#f4e2b6", accent: "#d9871b", card: "#fdf7ea", deep: "#2a2113", rgb: "217,135,27"  },
-  FILM:  { page: "#f7ccac", accent: "#e1561f", card: "#fdf2e9", deep: "#2c170d", rgb: "225,86,31"   },
-  SERIE: { page: "#c2d8f0", accent: "#2767ce", card: "#eff5fc", deep: "#101f33", rgb: "39,103,206"  },
-  GAME:  { page: "#c3e1bd", accent: "#2a9a4e", card: "#eff7ed", deep: "#13261a", rgb: "42,154,78"   },
-  COMIC: { page: "#ddc8ee", accent: "#8338d6", card: "#f6eefc", deep: "#211433", rgb: "131,56,214"  },
+  // ALL: Un grigio/crema moderno e pulito, non stancante
+  ALL:   { page: "#f4f4f6", accent: "#2c3e50", card: "#ffffff", deep: "#1a1a1a", rgb: "44,62,80" },
+  
+  // FILM: Un bel color salmone/arancio bruciato deciso
+  FILM:  { page: "#fbe9e7", accent: "#dd2c00", card: "#ffffff", deep: "#3e2723", rgb: "221,44,0" },
+  
+  // SERIE: Un azzurro cielo saturo che sa di display
+  SERIE: { page: "#e3f2fd", accent: "#0d47a1", card: "#ffffff", deep: "#0d1b2a", rgb: "13,71,161" },
+  
+  // GAME: Un verde menta energetico
+  GAME:  { page: "#e8f5e9", accent: "#1b5e20", card: "#ffffff", deep: "#004d40", rgb: "27,94,32" },
+  
+  // COMIC: Un lilla pop molto giovanile
+  COMIC: { page: "#f3e5f5", accent: "#4a148c", card: "#ffffff", deep: "#311b92", rgb: "74,20,140" },
 };
 
 const CATS = ["ALL", "FILM", "SERIE", "GAME", "COMIC"];
