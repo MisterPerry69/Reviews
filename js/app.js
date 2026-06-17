@@ -6,20 +6,11 @@ const CAT_EMOJI = { FILM: "🎬", SERIE: "📺", GAME: "🎮", COMIC: "📚" };
 
 /* page (pastello cartella), accent (saturo), card (crema), deep (scuro per il dettaglio), rgb */
 const CAT_TOKENS = {
-  // ALL: Un grigio-antracite caldo, molto cinematografico
-  ALL:   { page: "#141210", accent: "#f39c12", card: "#1e1b18", deep: "#080706", rgb: "243,156,18" },
-  
-  // FILM: Un rosso/mattone profondo (stile poltrona del cinema)
-  FILM:  { page: "#1a0f0a", accent: "#e65100", card: "#26160f", deep: "#0a0604", rgb: "230,81,0" },
-  
-  // SERIE: Un blu notte tech (stile streaming)
-  SERIE: { page: "#0a1118", accent: "#29b6f6", card: "#111b27", deep: "#04070a", rgb: "41,182,246" },
-  
-  // GAME: Un verde foresta scuro (stile cyber/gaming neon)
-  GAME:  { page: "#0b140d", accent: "#00e676", card: "#132317", deep: "#040705", rgb: "0,230,118" },
-  
-  // COMIC: Un viola cupo e misterioso (stile cyberpunk/fumetteria)
-  COMIC: { page: "#130f1a", accent: "#ba68c8", card: "#1f182a", deep: "#07050a", rgb: "186,104,200" },
+  ALL:   { page: "#f4e2b6", accent: "#d9871b", card: "#fdf7ea", deep: "#2a2113", rgb: "217,135,27"  },
+  FILM:  { page: "#f7ccac", accent: "#e1561f", card: "#fdf2e9", deep: "#2c170d", rgb: "225,86,31"   },
+  SERIE: { page: "#c2d8f0", accent: "#2767ce", card: "#eff5fc", deep: "#101f33", rgb: "39,103,206"  },
+  GAME:  { page: "#c3e1bd", accent: "#2a9a4e", card: "#eff7ed", deep: "#13261a", rgb: "42,154,78"   },
+  COMIC: { page: "#ddc8ee", accent: "#8338d6", card: "#f6eefc", deep: "#211433", rgb: "131,56,214"  },
 };
 
 const CATS = ["ALL", "FILM", "SERIE", "GAME", "COMIC"];
