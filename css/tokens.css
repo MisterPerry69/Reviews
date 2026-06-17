@@ -10,7 +10,7 @@
   --font-body:    'Outfit', system-ui, sans-serif;
 
   /* ── Base scura (dietro la cartellina) ── */
-  --base: #2c241f;
+  --base: #3a3a3c;
 
   /* ── Inchiostro (testi scuri su pastello) ── */
   --ink:       #2a2622;
@@ -21,17 +21,17 @@
      page  = sfondo pastello chiaro (tinge tutto)
      accent= saturo (titoli, stelle, tab, FAB, badge)
      card  = superficie crema sopra il pastello          */
-  --all-page:   #f4e2b6;  --all-accent:   #d9871b;  --all-card:   #fdf7ea;  --all-rgb: 217,135,27;
-  --film-page:  #f7ccac;  --film-accent:  #e1561f;  --film-card:  #fdf2e9;  --film-rgb: 225,86,31;
-  --serie-page: #c2d8f0;  --serie-accent: #2767ce;  --serie-card: #eff5fc;  --serie-rgb: 39,103,206;
-  --game-page:  #c3e1bd;  --game-accent:  #2a9a4e;  --game-card:  #eff7ed;  --game-rgb: 42,154,78;
-  --comic-page: #ddc8ee;  --comic-accent: #8338d6;  --comic-card: #f6eefc;  --comic-rgb: 131,56,214;
+  --all-page:   #3a3a3c;  --all-accent:   #e0a050;  --all-card:   #fff6f6;  --all-rgb: 224,160,80;
+  --film-page:  #f0a878;  --film-accent:  #e0481a;  --film-card:  #fbe6d6;  --film-rgb: 224,72,26;
+  --serie-page: #8fb8ec;  --serie-accent: #1f5fc8;  --serie-card: #e2edfa;  --serie-rgb: 31,95,200;
+  --game-page:  #8ccb86;  --game-accent:  #1f9148;  --game-card:  #e2f3de;  --game-rgb: 31,145,72;
+  --comic-page: #c9a4ec;  --comic-accent: #7a2fd0;  --comic-card: #f1e6fb;  --comic-rgb: 122,47,208;
 
   /* ── Stato corrente (JS sovrascrive su :root durante drag) ── */
   --current-page:   var(--all-page);
   --current-accent: var(--all-accent);
   --current-card:   var(--all-card);
-  --current-rgb:    217,135,27;
+  --current-rgb:    224,160,80;
 
   /* Semantici */
   --positive: #2a9a4e;

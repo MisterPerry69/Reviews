@@ -6,8 +6,10 @@ Crea un nuovo Sheet con un tab chiamato esattamente `reviews` (minuscolo).
 
 Colonne (senza header obbligatorio, ma utile aggiungerlo):
 ```
-A: id | B: data | C: titolo | D: categoria | E: rating | F: commento | G: image_url | H: riassunto | I: metadata | J: pros | K: cons
+A: id | B: data | C: titolo | D: categoria | E: rating | F: commento | G: image_url | H: riassunto | I: metadata | J: pros | K: cons | L: raw_text
 ```
+
+> `L: raw_text` = testo grezzo originale scritto dall'utente. Viene salvato per le nuove recensioni e serve alla funzione "Rigenera". Le recensioni migrate/esistenti possono averlo vuoto: per quelle il tasto Rigenera non è disponibile.
 
 **Migrazione dati**: copia le righe dal tab "REVIEWS" del Sheet LifeOS → tab `reviews` del nuovo Sheet. Le colonne sono identiche.
 

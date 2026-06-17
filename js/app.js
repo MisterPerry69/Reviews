@@ -6,11 +6,11 @@ const CAT_EMOJI = { FILM: "🎬", SERIE: "📺", GAME: "🎮", COMIC: "📚" };
 
 /* page (pastello cartella), accent (saturo), card (crema), deep (scuro per il dettaglio), rgb */
 const CAT_TOKENS = {
-  ALL:   { page: "#f4e2b6", accent: "#d9871b", card: "#fdf7ea", deep: "#2a2113", rgb: "217,135,27"  },
-  FILM:  { page: "#f7ccac", accent: "#e1561f", card: "#fdf2e9", deep: "#2c170d", rgb: "225,86,31"   },
-  SERIE: { page: "#c2d8f0", accent: "#2767ce", card: "#eff5fc", deep: "#101f33", rgb: "39,103,206"  },
-  GAME:  { page: "#c3e1bd", accent: "#2a9a4e", card: "#eff7ed", deep: "#13261a", rgb: "42,154,78"   },
-  COMIC: { page: "#ddc8ee", accent: "#8338d6", card: "#f6eefc", deep: "#211433", rgb: "131,56,214"  },
+  ALL:   { page: "#3a3a3c", accent: "#e0a050", card: "#fff6f6", deep: "#1f1f21", rgb: "224,160,80" },
+  FILM:  { page: "#f0a878", accent: "#e0481a", card: "#fbe6d6", deep: "#2c170d", rgb: "224,72,26"  },
+  SERIE: { page: "#8fb8ec", accent: "#1f5fc8", card: "#e2edfa", deep: "#101f33", rgb: "31,95,200"  },
+  GAME:  { page: "#8ccb86", accent: "#1f9148", card: "#e2f3de", deep: "#13261a", rgb: "31,145,72"  },
+  COMIC: { page: "#c9a4ec", accent: "#7a2fd0", card: "#f1e6fb", deep: "#211433", rgb: "122,47,208" },
 };
 
 const CATS = ["ALL", "FILM", "SERIE", "GAME", "COMIC"];

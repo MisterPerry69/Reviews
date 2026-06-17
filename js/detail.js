@@ -91,8 +91,16 @@ function openDetail(review) {
     promoteBtn.classList.add("hidden");
   }
 
+  /* Rigenera: solo se c'è il testo grezzo originale */
+  const regenBtn = document.getElementById("detail-regen-btn");
+  regenBtn.classList.toggle("hidden", !(review.raw_text && review.raw_text.trim()));
+
+  /* Parti sempre in view mode */
+  exitEditMode();
+
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
+  if (window.lucide) lucide.createIcons();
 }
 
 function closeDetail() {
@@ -127,6 +135,122 @@ async function promoteReview() {
   btn.disabled    = false;
 }
 
+/* ════════════════════════════════════
+   EDIT MODE — modifica manuale inline
+════════════════════════════════════ */
+
+function _pcRow(value, target) {
+  const wrap = document.createElement("div");
+  wrap.className = "edit-pc-item";
+  const inp = document.createElement("input");
+  inp.type = "text";
+  inp.value = value || "";
+  inp.placeholder = target === "pros" ? "Un pro…" : "Un contro…";
+  const rm = document.createElement("button");
+  rm.type = "button";
+  rm.className = "btn-pc-remove";
+  rm.textContent = "×";
+  rm.addEventListener("click", () => wrap.remove());
+  wrap.append(inp, rm);
+  return wrap;
+}
+
+function _renderEditablePC(target, items) {
+  const list = document.getElementById(target === "pros" ? "edit-pros-list" : "edit-cons-list");
+  list.innerHTML = "";
+  (items || []).forEach(v => list.appendChild(_pcRow(v, target)));
+}
+
+function enterEditMode() {
+  if (!_detailReview) return;
+  const r = _detailReview;
+
+  document.getElementById("edit-titolo").value   = r.titolo || "";
+  document.getElementById("edit-categoria").value = getCleanCat(r) || "FILM";
+  document.getElementById("edit-rating").value   = String(r.rating || 0);
+  document.getElementById("edit-stato").value    = isWish(r) ? "WISH" : isProgress(r) ? "IN_PROGRESS" : "";
+  document.getElementById("edit-metadata").value = r.metadata || "";
+  document.getElementById("edit-commento").value = r.commento || "";
+
+  let pros = [], cons = [];
+  try { pros = JSON.parse(r.pros || "[]"); } catch(e) {}
+  try { cons = JSON.parse(r.cons || "[]"); } catch(e) {}
+  _renderEditablePC("pros", pros);
+  _renderEditablePC("cons", cons);
+
+  document.getElementById("detail-view").classList.add("hidden");
+  document.getElementById("detail-edit").classList.remove("hidden");
+  document.querySelector("#detail-modal .detail-body").scrollTop = 0;
+}
+
+function exitEditMode() {
+  document.getElementById("detail-edit").classList.add("hidden");
+  document.getElementById("detail-view").classList.remove("hidden");
+}
+
+function _collectPC(target) {
+  const list = document.getElementById(target === "pros" ? "edit-pros-list" : "edit-cons-list");
+  return Array.from(list.querySelectorAll("input"))
+    .map(i => i.value.trim())
+    .filter(v => v.length > 0);
+}
+
+async function saveEdit() {
+  if (!_detailReview) return;
+  const stato = document.getElementById("edit-stato").value;
+  let cat = document.getElementById("edit-categoria").value;
+  if (stato) cat += "," + stato;
+
+  const payload = {
+    id:        _detailReview.id,
+    titolo:    document.getElementById("edit-titolo").value.trim(),
+    categoria: cat,
+    rating:    parseFloat(document.getElementById("edit-rating").value) || 0,
+    commento:  document.getElementById("edit-commento").value.trim(),
+    metadata:  document.getElementById("edit-metadata").value.trim(),
+    pros:      _collectPC("pros"),
+    cons:      _collectPC("cons")
+  };
+
+  const btn = document.getElementById("detail-save-btn");
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.textContent = "…";
+
+  try {
+    const res = await apiPost("reviews_update", payload);
+    if (res.status !== "SUCCESS") throw new Error(res.message || "Errore");
+    closeDetail();
+    refreshReviews();
+  } catch(e) {
+    console.error("saveEdit:", e);
+    btn.textContent = orig;
+    btn.disabled = false;
+    alert("Errore nel salvataggio: " + e.message);
+  }
+}
+
+async function regenerateReview() {
+  if (!_detailReview) return;
+  const btn = document.getElementById("detail-regen-btn");
+  btn.disabled = true;
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<div class="spinner"></div>';
+
+  try {
+    const res = await apiPost("reviews_regenerate", { id: _detailReview.id });
+    if (res.status !== "SUCCESS") throw new Error(res.message || "Errore");
+    closeDetail();
+    refreshReviews();
+  } catch(e) {
+    console.error("regenerateReview:", e);
+    btn.innerHTML = orig;
+    btn.disabled = false;
+    if (window.lucide) lucide.createIcons();
+    alert("Rigenerazione non riuscita: " + e.message);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("detail-close-btn").addEventListener("click", closeDetail);
 
@@ -135,4 +259,16 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("detail-promote-btn").addEventListener("click", promoteReview);
+  document.getElementById("detail-edit-btn").addEventListener("click", enterEditMode);
+  document.getElementById("detail-cancel-btn").addEventListener("click", exitEditMode);
+  document.getElementById("detail-save-btn").addEventListener("click", saveEdit);
+  document.getElementById("detail-regen-btn").addEventListener("click", regenerateReview);
+
+  document.querySelectorAll(".btn-pc-add").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.target;
+      const list = document.getElementById(target === "pros" ? "edit-pros-list" : "edit-cons-list");
+      list.appendChild(_pcRow("", target));
+    });
+  });
 });

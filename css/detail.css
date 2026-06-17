@@ -208,3 +208,102 @@
   color: #fff;
   border-color: transparent;
 }
+
+/* ── Azioni (modifica / rigenera / salva / annulla) ── */
+.detail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.btn-detail-action {
+  flex: 1;
+  padding: 14px 0;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: var(--r-pill);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.82);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background 0.14s ease, color 0.14s ease, border-color 0.14s ease, opacity 0.14s ease;
+}
+.btn-detail-action svg { width: 16px; height: 16px; stroke-width: 2.2; }
+.btn-detail-action:hover { background: rgba(255,255,255,0.13); }
+.btn-detail-action:disabled { opacity: 0.45; cursor: default; }
+.btn-edit-save {
+  background: var(--current-accent);
+  color: #fff;
+  border-color: transparent;
+}
+.btn-edit-save:hover { filter: brightness(1.08); background: var(--current-accent); }
+
+/* ── Edit mode ── */
+.edit-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--current-accent);
+  margin: 18px 0 7px;
+}
+.edit-hint { color: rgba(255,255,255,0.4); font-weight: 400; }
+.edit-input {
+  width: 100%;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: var(--r-sm);
+  padding: 11px 13px;
+  font-size: 0.98rem;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.14s ease;
+}
+.edit-input:focus { border-color: var(--current-accent); }
+.edit-input option { color: #111; }
+.edit-textarea { resize: vertical; line-height: 1.55; }
+.edit-row { display: flex; gap: 12px; }
+.edit-col { flex: 1; min-width: 0; }
+
+.edit-pc-list { display: flex; flex-direction: column; gap: 7px; }
+.edit-pc-item { display: flex; gap: 6px; align-items: center; }
+.edit-pc-item input {
+  flex: 1; min-width: 0;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: var(--r-sm);
+  padding: 8px 10px;
+  font-size: 0.85rem;
+  color: #fff;
+  outline: none;
+}
+.edit-pc-item input:focus { border-color: var(--current-accent); }
+.btn-pc-remove {
+  flex-shrink: 0;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.6);
+  display: grid; place-items: center;
+  font-size: 1.1rem; line-height: 1;
+  cursor: pointer;
+}
+.btn-pc-remove:hover { background: var(--negative); color: #fff; }
+.btn-pc-add {
+  margin-top: 8px;
+  background: none;
+  border: 1px dashed rgba(255,255,255,0.22);
+  border-radius: var(--r-sm);
+  padding: 8px;
+  width: 100%;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.6);
+  cursor: pointer;
+  transition: border-color 0.14s ease, color 0.14s ease;
+}
+.btn-pc-add:hover { border-color: var(--current-accent); color: var(--current-accent); }

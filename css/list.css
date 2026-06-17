@@ -17,7 +17,6 @@
   min-height: 160px;
   background: var(--current-card);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-card);    /* ombra nera morbida, NO glow */
   cursor: pointer;
   transition: transform 0.32s var(--ease-jelly), box-shadow 0.2s ease, background 0.4s ease;
   will-change: transform;
@@ -129,7 +128,6 @@
   height: 132px;
   background: var(--current-card);
   border-radius: var(--r-lg);
-  box-shadow: var(--sh-soft);
   overflow: hidden;
   position: relative;
 }

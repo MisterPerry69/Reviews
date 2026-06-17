@@ -19,9 +19,8 @@
 
   <!-- SPLASH -->
   <div id="splash" class="splash">
-    <div class="splash-blob"></div>
     <img class="splash-logo" src="logo.svg" alt="rank★d" />
-    <div class="splash-dots"><span></span><span></span><span></span></div>
+    <div class="splash-dots"><span></span><span></span><span></span><span></span></div>
   </div>
 
   <!-- APP SHELL -->
@@ -122,30 +121,105 @@
         </button>
       </div>
       <div class="detail-body">
-        <div class="detail-title" id="detail-title"></div>
-        <div class="detail-meta-row">
-          <span class="cat-badge" id="detail-cat-badge"></span>
-          <span class="detail-rating stars" id="detail-rating"></span>
-          <span class="detail-metadata" id="detail-metadata"></span>
-          <span class="detail-date" id="detail-date"></span>
-        </div>
-        <div class="detail-section">
-          <div class="detail-section-label">Recensione</div>
-          <div class="detail-commento" id="detail-commento"></div>
-        </div>
-        <div id="detail-pros-cons-wrap" class="detail-section hidden">
-          <div class="detail-pros-cons">
-            <div class="detail-pros" id="detail-pros-section">
-              <div class="detail-pc-label">Pro</div>
-              <ul class="detail-pc-list" id="detail-pros-list"></ul>
-            </div>
-            <div class="detail-cons" id="detail-cons-section">
-              <div class="detail-pc-label">Contro</div>
-              <ul class="detail-pc-list" id="detail-cons-list"></ul>
+
+        <!-- ░░ VIEW MODE ░░ -->
+        <div id="detail-view">
+          <div class="detail-title" id="detail-title"></div>
+          <div class="detail-meta-row">
+            <span class="cat-badge" id="detail-cat-badge"></span>
+            <span class="detail-rating stars" id="detail-rating"></span>
+            <span class="detail-metadata" id="detail-metadata"></span>
+            <span class="detail-date" id="detail-date"></span>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-label">Recensione</div>
+            <div class="detail-commento" id="detail-commento"></div>
+          </div>
+          <div id="detail-pros-cons-wrap" class="detail-section hidden">
+            <div class="detail-pros-cons">
+              <div class="detail-pros" id="detail-pros-section">
+                <div class="detail-pc-label">Pro</div>
+                <ul class="detail-pc-list" id="detail-pros-list"></ul>
+              </div>
+              <div class="detail-cons" id="detail-cons-section">
+                <div class="detail-pc-label">Contro</div>
+                <ul class="detail-pc-list" id="detail-cons-list"></ul>
+              </div>
             </div>
           </div>
+          <button class="btn-promote hidden" id="detail-promote-btn">Promuovi a Recensione</button>
+
+          <!-- Azioni: modifica / rigenera -->
+          <div class="detail-actions">
+            <button class="btn-detail-action" id="detail-edit-btn">
+              <i data-lucide="pencil"></i> Modifica
+            </button>
+            <button class="btn-detail-action hidden" id="detail-regen-btn">
+              <i data-lucide="sparkles"></i> Rigenera
+            </button>
+          </div>
         </div>
-        <button class="btn-promote hidden" id="detail-promote-btn">Promuovi a Recensione</button>
+
+        <!-- ░░ EDIT MODE ░░ -->
+        <div id="detail-edit" class="hidden">
+          <label class="edit-label">Titolo</label>
+          <input type="text" id="edit-titolo" class="edit-input" />
+
+          <div class="edit-row">
+            <div class="edit-col">
+              <label class="edit-label">Categoria</label>
+              <select id="edit-categoria" class="edit-input">
+                <option value="FILM">Film</option>
+                <option value="SERIE">Serie</option>
+                <option value="GAME">Game</option>
+                <option value="COMIC">Comic</option>
+              </select>
+            </div>
+            <div class="edit-col">
+              <label class="edit-label">Voto</label>
+              <select id="edit-rating" class="edit-input">
+                <option value="0">—</option>
+                <option value="0.5">0.5</option><option value="1">1</option>
+                <option value="1.5">1.5</option><option value="2">2</option>
+                <option value="2.5">2.5</option><option value="3">3</option>
+                <option value="3.5">3.5</option><option value="4">4</option>
+                <option value="4.5">4.5</option><option value="5">5</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="edit-label">Stato</label>
+          <select id="edit-stato" class="edit-input">
+            <option value="">Recensito</option>
+            <option value="WISH">Wishlist</option>
+            <option value="IN_PROGRESS">In corso</option>
+          </select>
+
+          <label class="edit-label">Metadata <span class="edit-hint">(anno • autore • genere)</span></label>
+          <input type="text" id="edit-metadata" class="edit-input" />
+
+          <label class="edit-label">Recensione</label>
+          <textarea id="edit-commento" class="edit-input edit-textarea" rows="5"></textarea>
+
+          <div class="edit-row">
+            <div class="edit-col">
+              <label class="edit-label">Pro</label>
+              <div id="edit-pros-list" class="edit-pc-list"></div>
+              <button class="btn-pc-add" data-target="pros">+ Aggiungi pro</button>
+            </div>
+            <div class="edit-col">
+              <label class="edit-label">Contro</label>
+              <div id="edit-cons-list" class="edit-pc-list"></div>
+              <button class="btn-pc-add" data-target="cons">+ Aggiungi contro</button>
+            </div>
+          </div>
+
+          <div class="detail-actions">
+            <button class="btn-detail-action btn-edit-cancel" id="detail-cancel-btn">Annulla</button>
+            <button class="btn-detail-action btn-edit-save" id="detail-save-btn">Salva</button>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>

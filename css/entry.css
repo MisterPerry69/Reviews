@@ -82,7 +82,6 @@
   align-items: center;
   gap: 16px;
   margin: 0 16px;
-  box-shadow: var(--sh-card);
   animation: cardDrop 0.45s var(--ease-jelly) both;
 }
 
