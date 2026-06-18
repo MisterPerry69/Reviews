@@ -10,7 +10,7 @@
   --font-body:    'Outfit', system-ui, sans-serif;
 
   /* ── Base scura (dietro la cartellina) ── */
-  --base: #3a3a3c;
+  --base: #11120d;
 
   /* ── Inchiostro (testi scuri su pastello) ── */
   --ink:       #2a2622;
@@ -21,7 +21,7 @@
      page  = sfondo pastello chiaro (tinge tutto)
      accent= saturo (titoli, stelle, tab, FAB, badge)
      card  = superficie crema sopra il pastello          */
-  --all-page:   #3a3a3c;  --all-accent:   #e0a050;  --all-card:   #fff6f6;  --all-rgb: 224,160,80;
+  --all-page:   #11120d;  --all-accent:   #e0a050;  --all-card:   #fff6f6;  --all-rgb: 224,160,80;
   --film-page:  #f0a878;  --film-accent:  #e0481a;  --film-card:  #fbe6d6;  --film-rgb: 224,72,26;
   --serie-page: #8fb8ec;  --serie-accent: #1f5fc8;  --serie-card: #e2edfa;  --serie-rgb: 31,95,200;
   --game-page:  #8ccb86;  --game-accent:  #1f9148;  --game-card:  #e2f3de;  --game-rgb: 31,145,72;
