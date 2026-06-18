@@ -99,7 +99,7 @@ img { display: block; }
   pointer-events: none;     /* solo i bottoni cliccabili */
 }
 .app-header > * { pointer-events: auto; }
-.header-logo { height: 30px; width: auto; }
+.header-logo { height: 30px; width: auto; margin-left: 20px; margin-bottom: 10px;}
 .header-actions { display: flex; align-items: center; gap: 4px; }
 
 .header-icon-btn {
@@ -116,6 +116,9 @@ img { display: block; }
   box-shadow: var(--sh-soft);
 }
 .header-icon-btn svg { width: 20px; height: 20px; stroke-width: 2; }
+/* Su ALL il page è scuro: icone header chiare per restare visibili */
+:root[data-cat="ALL"] .header-icon-btn { color: rgba(255,255,255,0.62); }
+:root[data-cat="ALL"] .header-icon-btn.active { color: #fff; }
 
 /* ═════════════════════════════
    ICONE CATEGORIA — pillola trasparente flottante sul colore
