@@ -6,7 +6,7 @@ const CAT_EMOJI = { FILM: "🎬", SERIE: "📺", GAME: "🎮", COMIC: "📚" };
 
 /* page (pastello cartella), accent (saturo), card (crema), deep (scuro per il dettaglio), rgb */
 const CAT_TOKENS = {
-  ALL:   { page: "#3a3a3c", accent: "#e0a050", card: "#fff6f6", deep: "#1f1f21", rgb: "224,160,80" },
+  ALL:   { page: "#11120d", accent: "#e0a050", card: "#fff6f6", deep: "#1f1f21", rgb: "224,160,80" },
   FILM:  { page: "#f0a878", accent: "#e0481a", card: "#fbe6d6", deep: "#2c170d", rgb: "224,72,26"  },
   SERIE: { page: "#8fb8ec", accent: "#1f5fc8", card: "#e2edfa", deep: "#101f33", rgb: "31,95,200"  },
   GAME:  { page: "#8ccb86", accent: "#1f9148", card: "#e2f3de", deep: "#13261a", rgb: "31,145,72"  },
