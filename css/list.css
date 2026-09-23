@@ -161,3 +161,9 @@
 .reviews-list.animate-in .review-card:nth-child(7)  { animation-delay: 0.52s; }
 .reviews-list.animate-in .review-card:nth-child(8)  { animation-delay: 0.60s; }
 .reviews-list.animate-in .review-card:nth-child(n+9){ animation-delay: 0.66s; }
+
+.review-rate-group { display: inline-flex; align-items: center; gap: 6px; }
+.review-card[data-cat="FILM"]  .liked-mark { color: var(--film-accent); }
+.review-card[data-cat="SERIE"] .liked-mark { color: var(--serie-accent); }
+.review-card[data-cat="GAME"]  .liked-mark { color: var(--game-accent); }
+.review-card[data-cat="COMIC"] .liked-mark { color: var(--comic-accent); }

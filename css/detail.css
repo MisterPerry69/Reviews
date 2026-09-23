@@ -307,3 +307,9 @@
   transition: border-color 0.14s ease, color 0.14s ease;
 }
 .btn-pc-add:hover { border-color: var(--current-accent); color: var(--current-accent); }
+
+/* Titolo + cuore preferito */
+.edit-title-row { display: flex; align-items: center; gap: 8px; }
+.edit-title-row .edit-input { flex: 1; min-width: 0; }
+#detail-edit .heart-toggle { --heart-off: rgba(255,255,255,0.4); }
+.detail-meta-row .liked-mark { font-size: 20px; margin-left: -4px; }

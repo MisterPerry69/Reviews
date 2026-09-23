@@ -3,6 +3,7 @@
    ============================================ */
 
 let _detailReview = null;
+let _editStars = null, _editLiked = null;
 
 function openDetail(review) {
   _detailReview = review;
@@ -48,6 +49,11 @@ function openDetail(review) {
     ratingEl.innerHTML = "";
     ratingEl.classList.add("hidden");
   }
+
+  /* Preferito */
+  const likedEl = document.getElementById("detail-liked");
+  likedEl.innerHTML = heartSvg();
+  likedEl.classList.toggle("hidden", !review.liked);
 
   /* Badge */
   const badgeEl = document.getElementById("detail-cat-badge");
@@ -167,7 +173,8 @@ function enterEditMode() {
 
   document.getElementById("edit-titolo").value   = r.titolo || "";
   document.getElementById("edit-categoria").value = getCleanCat(r) || "FILM";
-  document.getElementById("edit-rating").value   = String(r.rating || 0);
+  _editStars.set(parseFloat(r.rating) || 0);
+  _editLiked.set(!!r.liked);
   document.getElementById("edit-stato").value    = isWish(r) ? "WISH" : isProgress(r) ? "IN_PROGRESS" : "";
   document.getElementById("edit-metadata").value = r.metadata || "";
   document.getElementById("edit-commento").value = r.commento || "";
@@ -205,7 +212,8 @@ async function saveEdit() {
     id:        _detailReview.id,
     titolo:    document.getElementById("edit-titolo").value.trim(),
     categoria: cat,
-    rating:    parseFloat(document.getElementById("edit-rating").value) || 0,
+    rating:    _editStars.get(),
+    liked:     _editLiked.get(),
     commento:  document.getElementById("edit-commento").value.trim(),
     metadata:  document.getElementById("edit-metadata").value.trim(),
     pros:      _collectPC("pros"),
@@ -254,6 +262,8 @@ async function regenerateReview() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  _editStars = initStarPicker(document.getElementById("edit-rating"));
+  _editLiked = initHeartToggle(document.getElementById("edit-liked"));
   document.getElementById("detail-close-btn").addEventListener("click", closeDetail);
 
   document.getElementById("detail-modal").addEventListener("click", e => {

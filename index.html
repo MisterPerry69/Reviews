@@ -21,7 +21,7 @@
 
   <!-- SPLASH -->
   <div id="splash" class="splash">
-    <img class="splash-logo" src="logo.png" alt="rank★d" />
+    <img class="splash-logo" src="logo.svg" alt="rank★d" />
     <div class="splash-dots"><span></span><span></span><span></span><span></span></div>
   </div>
 
@@ -30,7 +30,7 @@
 
     <!-- HEADER -->
     <header class="app-header">
-      <img class="header-logo" src="logo.png" alt="rank★d" />
+      <img class="header-logo" src="logo.svg" alt="rank★d" />
       <div class="header-actions">
         <button class="header-icon-btn active" data-state="reviews" aria-label="Recensioni">
           <i data-lucide="layout-grid"></i>
@@ -130,6 +130,7 @@
           <div class="detail-meta-row">
             <span class="cat-badge" id="detail-cat-badge"></span>
             <span class="detail-rating stars" id="detail-rating"></span>
+            <span class="liked-mark hidden" id="detail-liked" aria-label="Preferito"></span>
             <span class="detail-metadata" id="detail-metadata"></span>
             <span class="detail-date" id="detail-date"></span>
           </div>
@@ -165,7 +166,14 @@
         <!-- ░░ EDIT MODE ░░ -->
         <div id="detail-edit" class="hidden">
           <label class="edit-label">Titolo</label>
-          <input type="text" id="edit-titolo" class="edit-input" />
+          <div class="edit-title-row">
+            <input type="text" id="edit-titolo" class="edit-input" />
+            <button type="button" class="heart-toggle" id="edit-liked" aria-label="Preferito" aria-pressed="false"></button>
+          </div>
+
+          <label class="edit-label">Voto</label>
+          <div id="edit-rating" class="stars star-picker" role="slider" tabindex="0"
+               aria-label="Voto" aria-valuemin="0" aria-valuemax="5"></div>
 
           <div class="edit-row">
             <div class="edit-col">
@@ -178,24 +186,14 @@
               </select>
             </div>
             <div class="edit-col">
-              <label class="edit-label">Voto</label>
-              <select id="edit-rating" class="edit-input">
-                <option value="0">—</option>
-                <option value="0.5">0.5</option><option value="1">1</option>
-                <option value="1.5">1.5</option><option value="2">2</option>
-                <option value="2.5">2.5</option><option value="3">3</option>
-                <option value="3.5">3.5</option><option value="4">4</option>
-                <option value="4.5">4.5</option><option value="5">5</option>
+              <label class="edit-label">Stato</label>
+              <select id="edit-stato" class="edit-input">
+                <option value="">Recensito</option>
+                <option value="WISH">Wishlist</option>
+                <option value="IN_PROGRESS">In corso</option>
               </select>
             </div>
           </div>
-
-          <label class="edit-label">Stato</label>
-          <select id="edit-stato" class="edit-input">
-            <option value="">Recensito</option>
-            <option value="WISH">Wishlist</option>
-            <option value="IN_PROGRESS">In corso</option>
-          </select>
 
           <label class="edit-label">Metadata <span class="edit-hint">(anno • autore • genere)</span></label>
           <input type="text" id="edit-metadata" class="edit-input" />
@@ -237,9 +235,14 @@
       </div>
       <div class="entry-body">
         <p class="entry-hint">
-          Scrivi una nuova recensione.
+          Scrivi come parli — l'AI sistema la forma mantenendo il tuo tono.<br>
+          Es: "Dune parte 2, visivamente pazzesco, storia un po' lunga però. 4/5"
         </p>
         <textarea id="entry-textarea" class="entry-textarea" placeholder="Scrivi qui..." rows="5"></textarea>
+        <div class="entry-liked-row">
+          <button type="button" class="heart-toggle" id="entry-liked" aria-label="Preferito" aria-pressed="false"></button>
+          <span class="entry-liked-label">Preferito</span>
+        </div>
       </div>
       <div class="entry-footer">
         <button class="btn-entry-cancel" id="entry-cancel-btn">Annulla</button>

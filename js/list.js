@@ -92,9 +92,12 @@ function _renderCard(r) {
         <div class="review-title">${escapeHtml(r.titolo)}</div>
         <div class="review-snippet">${escapeHtml(r.riassunto || r.commento)}</div>
         <div class="review-meta-row">
-          ${!wish && !progress && r.rating > 0
-            ? `<span class="review-rating stars">${renderStars(r.rating)}</span>`
-            : `<span class="review-rating"></span>`}
+          <span class="review-rate-group">
+            ${!wish && !progress && r.rating > 0
+              ? `<span class="review-rating stars">${renderStars(r.rating)}</span>`
+              : `<span class="review-rating"></span>`}
+            ${r.liked ? `<span class="liked-mark" aria-label="Preferito">${heartSvg()}</span>` : ""}
+          </span>
           <span class="cat-badge">${escapeHtml(metaLabel)}</span>
         </div>
       </div>

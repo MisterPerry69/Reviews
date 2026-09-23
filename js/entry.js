@@ -2,10 +2,13 @@
    REEL — Entry modal
    ============================================ */
 
+let _entryLiked = null;
+
 function openEntry(prefill) {
   const modal    = document.getElementById("entry-modal");
   const textarea = document.getElementById("entry-textarea");
   textarea.value = prefill || "";
+  _entryLiked.set(false);
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
   setTimeout(() => textarea.focus(), 80);
@@ -21,6 +24,7 @@ async function submitEntry() {
   const textarea = document.getElementById("entry-textarea");
   const text     = textarea.value.trim();
   if (!text) return;
+  const liked = _entryLiked.get();
 
   const btn  = document.getElementById("entry-submit-btn");
   btn.disabled = true;
@@ -39,7 +43,7 @@ async function submitEntry() {
   listEl.prepend(loadCard);
 
   try {
-    const res = await apiPost("reviews_process", { text });
+    const res = await apiPost("reviews_process", { text, liked });
     loadCard.remove();
 
     if (res.status === "SUCCESS" && res.data) {
@@ -73,6 +77,8 @@ async function submitEntry() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  _entryLiked = initHeartToggle(document.getElementById("entry-liked"));
+  document.querySelector(".entry-liked-label").addEventListener("click", () => document.getElementById("entry-liked").click());
   document.getElementById("entry-close-btn").addEventListener("click", closeEntry);
   document.getElementById("entry-cancel-btn").addEventListener("click", closeEntry);
   document.getElementById("entry-submit-btn").addEventListener("click", submitEntry);

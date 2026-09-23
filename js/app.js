@@ -62,6 +62,68 @@ function renderStars(rating) {
   return out;
 }
 
+/* Stelle interattive (stile Letterboxd):
+   tap su una stella → piena, di nuovo → mezza, di nuovo → vuota; trascina per riempire */
+function initStarPicker(el) {
+  let value = 0;
+  function set(v) {
+    value = Math.max(0, Math.min(5, v));
+    el.innerHTML = renderStars(value);
+    el.setAttribute("aria-valuenow", value);
+    el.setAttribute("aria-valuetext", value ? String(value).replace(".", ",") + " su 5" : "Nessun voto");
+  }
+  // Posizione → voto a mezze stelle (metà sinistra di una stella = mezza)
+  function fromX(x) {
+    const stars = el.querySelectorAll(".star");
+    for (let i = 0; i < stars.length; i++) {
+      const r = stars[i].getBoundingClientRect();
+      if (x <= r.right || i === stars.length - 1) return i + (x < r.left + r.width / 2 ? 0.5 : 1);
+    }
+    return 0;
+  }
+
+  let startX = 0, active = false, dragging = false;
+  el.addEventListener("pointerdown", e => {
+    active = true; dragging = false; startX = e.clientX;
+    el.setPointerCapture(e.pointerId);
+  });
+  el.addEventListener("pointermove", e => {
+    if (!active) return;
+    if (!dragging && Math.abs(e.clientX - startX) > 6) dragging = true;
+    if (dragging) set(fromX(e.clientX));
+  });
+  el.addEventListener("pointerup", e => {
+    if (!active) return;
+    active = false;
+    if (dragging) return;
+    const i = Math.ceil(fromX(e.clientX));
+    set(value === i ? i - 0.5 : value === i - 0.5 ? i - 1 : i);
+  });
+  el.addEventListener("pointercancel", () => { active = false; });
+  el.addEventListener("keydown", e => {
+    if (e.key === "ArrowRight" || e.key === "ArrowUp")   { set(value + 0.5); e.preventDefault(); }
+    if (e.key === "ArrowLeft"  || e.key === "ArrowDown") { set(value - 0.5); e.preventDefault(); }
+  });
+
+  set(0);
+  return { get: () => value, set };
+}
+
+/* Cuore "preferito" */
+function heartSvg() {
+  return `<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.6s-7.6-4.7-9.4-9.4C1.3 7.9 3.5 4.4 7.1 4.4c2 0 3.6 1.1 4.9 2.8 1.3-1.7 2.9-2.8 4.9-2.8 3.6 0 5.8 3.5 4.5 6.8-1.8 4.7-9.4 9.4-9.4 9.4z"/></svg>`;
+}
+function initHeartToggle(btn) {
+  btn.innerHTML = heartSvg();
+  const set = on => btn.setAttribute("aria-pressed", on ? "true" : "false");
+  btn.addEventListener("click", () => {
+    set(btn.getAttribute("aria-pressed") !== "true");
+    btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+  });
+  set(false);
+  return { get: () => btn.getAttribute("aria-pressed") === "true", set };
+}
+
 function formatDate(dateStr) {
   if (!dateStr) return "";
   const p = dateStr.split("-");
