@@ -105,3 +105,5 @@
   cursor: pointer;
   user-select: none;
 }
+
+.entry-rating-row { margin: 0 0 12px; }

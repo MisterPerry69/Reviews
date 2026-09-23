@@ -2,29 +2,56 @@
    REEL — Entry modal
    ============================================ */
 
-let _entryLiked = null;
+let _entryLiked = null, _entryStars = null;
+let _entryPromote = null;   // voce wish/in corso da completare (null = nuova voce)
+
+function _showEntry() {
+  document.getElementById("entry-modal").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+  setTimeout(() => document.getElementById("entry-textarea").focus(), 80);
+}
 
 function openEntry(prefill) {
-  const modal    = document.getElementById("entry-modal");
-  const textarea = document.getElementById("entry-textarea");
-  textarea.value = prefill || "";
+  _entryPromote = null;
+  const modal = document.getElementById("entry-modal");
+  modal.style.removeProperty("--current-accent");
+  document.getElementById("entry-title").textContent = "Nuova voce";
+  document.getElementById("entry-rating-row").classList.add("hidden");
+  document.getElementById("entry-textarea").placeholder = "Scrivi qui...";
+  document.getElementById("entry-textarea").value = prefill || "";
   _entryLiked.set(false);
-  modal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-  setTimeout(() => textarea.focus(), 80);
+  _showEntry();
+}
+
+// Completa una voce wish/in corso: stesso box, con stelle, sulla STESSA riga del foglio
+function openPromote(review) {
+  _entryPromote = review;
+  const modal = document.getElementById("entry-modal");
+  const tok = CAT_TOKENS[getCleanCat(review)] || CAT_TOKENS.ALL;
+  modal.style.setProperty("--current-accent", tok.accent);
+  document.getElementById("entry-title").textContent = "Com'era " + review.titolo + "?";
+  document.getElementById("entry-rating-row").classList.remove("hidden");
+  document.getElementById("entry-textarea").placeholder = "Dì la tua…";
+  document.getElementById("entry-textarea").value = "";
+  _entryStars.set(0);
+  _entryLiked.set(!!review.liked);
+  _showEntry();
 }
 
 function closeEntry() {
   document.getElementById("entry-modal").classList.add("hidden");
   document.getElementById("entry-textarea").value = "";
   document.body.style.overflow = "";
+  _entryPromote = null;
 }
 
 async function submitEntry() {
   const textarea = document.getElementById("entry-textarea");
   const text     = textarea.value.trim();
   if (!text) return;
-  const liked = _entryLiked.get();
+  const liked   = _entryLiked.get();
+  const promote = _entryPromote;
+  const rating  = _entryStars.get();
 
   const btn  = document.getElementById("entry-submit-btn");
   btn.disabled = true;
@@ -43,8 +70,11 @@ async function submitEntry() {
   listEl.prepend(loadCard);
 
   try {
-    const res = await apiPost("reviews_process", { text, liked });
+    const res = promote
+      ? await apiPost("reviews_complete", { id: promote.id, text, rating, liked })
+      : await apiPost("reviews_process", { text, liked });
     loadCard.remove();
+    if (promote && res.status !== "SUCCESS") alert("Non sono riuscito a salvare: " + (res.message || "errore") + "\n\nIl testo era:\n" + text);
 
     if (res.status === "SUCCESS" && res.data) {
       const r = res.data;
@@ -78,6 +108,7 @@ async function submitEntry() {
 
 document.addEventListener("DOMContentLoaded", () => {
   _entryLiked = initHeartToggle(document.getElementById("entry-liked"));
+  _entryStars = initStarPicker(document.getElementById("entry-rating"));
   document.querySelector(".entry-liked-label").addEventListener("click", () => document.getElementById("entry-liked").click());
   document.getElementById("entry-close-btn").addEventListener("click", closeEntry);
   document.getElementById("entry-cancel-btn").addEventListener("click", closeEntry);

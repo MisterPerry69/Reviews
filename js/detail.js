@@ -64,7 +64,8 @@ function openDetail(review) {
   document.getElementById("detail-metadata").textContent = review.metadata || "";
   document.getElementById("detail-date").textContent = formatDate(review.data);
 
-  /* Commento */
+  /* Commento (su wish/in corso è una nota, non una recensione) */
+  document.getElementById("detail-commento-label").textContent = (wish || progress) ? "Note" : "Recensione";
   document.getElementById("detail-commento").textContent = review.commento || "";
 
   /* Pros / Cons */
@@ -76,7 +77,7 @@ function openDetail(review) {
   const consSection = document.getElementById("detail-cons-section");
   const pcWrap      = document.getElementById("detail-pros-cons-wrap");
 
-  if (pros.length > 0 || cons.length > 0) {
+  if (!wish && !progress && (pros.length > 0 || cons.length > 0)) {
     pcWrap.classList.remove("hidden");
     document.getElementById("detail-pros-list").innerHTML =
       pros.map(p => `<li>${escapeHtml(p)}</li>`).join("");
@@ -92,7 +93,7 @@ function openDetail(review) {
   const promoteBtn = document.getElementById("detail-promote-btn");
   if (wish || progress) {
     promoteBtn.classList.remove("hidden");
-    promoteBtn.textContent = wish ? "Promuovi a Recensione" : "Segna come Completato";
+    promoteBtn.textContent = wish ? "Promuovi a Recensione" : "Segna come completato";
   } else {
     promoteBtn.classList.add("hidden");
   }
@@ -115,30 +116,12 @@ function closeDetail() {
   _detailReview = null;
 }
 
-async function promoteReview() {
+// Apre il box "Com'era?": la voce diventa recensione solo quando pubblichi
+function promoteReview() {
   if (!_detailReview) return;
-  const btn  = document.getElementById("detail-promote-btn");
-  btn.disabled = true;
-  const orig = btn.textContent;
-  btn.textContent = "…";
-
-  const wish     = isWish(_detailReview);
-  const cleanCat = getCleanCat(_detailReview);
-
-  try {
-    await apiPost("reviews_promote", { id: _detailReview.id, newCat: cleanCat });
-    closeDetail();
-    if (wish) {
-      openEntry(_detailReview.titolo + " (" + cleanCat + ")");
-    } else {
-      refreshReviews();
-    }
-  } catch(e) {
-    console.error("promoteReview:", e);
-  }
-
-  btn.textContent = orig;
-  btn.disabled    = false;
+  const review = _detailReview;
+  closeDetail();
+  openPromote(review);
 }
 
 /* ════════════════════════════════════
@@ -176,6 +159,7 @@ function enterEditMode() {
   _editStars.set(parseFloat(r.rating) || 0);
   _editLiked.set(!!r.liked);
   document.getElementById("edit-stato").value    = isWish(r) ? "WISH" : isProgress(r) ? "IN_PROGRESS" : "";
+  _syncEditStato();
   document.getElementById("edit-metadata").value = r.metadata || "";
   document.getElementById("edit-commento").value = r.commento || "";
 
@@ -188,6 +172,14 @@ function enterEditMode() {
   document.getElementById("detail-view").classList.add("hidden");
   document.getElementById("detail-edit").classList.remove("hidden");
   document.querySelector("#detail-modal .detail-body").scrollTop = 0;
+}
+
+// Wish/in corso: niente voto né pro/contro, il testo è una nota
+function _syncEditStato() {
+  const note = !!document.getElementById("edit-stato").value;
+  document.getElementById("edit-rating-block").classList.toggle("hidden", note);
+  document.getElementById("edit-pc-block").classList.toggle("hidden", note);
+  document.getElementById("edit-commento-label").textContent = note ? "Note" : "Recensione";
 }
 
 function exitEditMode() {
@@ -216,8 +208,8 @@ async function saveEdit() {
     liked:     _editLiked.get(),
     commento:  document.getElementById("edit-commento").value.trim(),
     metadata:  document.getElementById("edit-metadata").value.trim(),
-    pros:      _collectPC("pros"),
-    cons:      _collectPC("cons")
+    pros:      stato ? [] : _collectPC("pros"),
+    cons:      stato ? [] : _collectPC("cons")
   };
 
   const btn = document.getElementById("detail-save-btn");
@@ -264,6 +256,7 @@ async function regenerateReview() {
 document.addEventListener("DOMContentLoaded", () => {
   _editStars = initStarPicker(document.getElementById("edit-rating"));
   _editLiked = initHeartToggle(document.getElementById("edit-liked"));
+  document.getElementById("edit-stato").addEventListener("change", _syncEditStato);
   document.getElementById("detail-close-btn").addEventListener("click", closeDetail);
 
   document.getElementById("detail-modal").addEventListener("click", e => {

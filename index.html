@@ -135,7 +135,7 @@
             <span class="detail-date" id="detail-date"></span>
           </div>
           <div class="detail-section">
-            <div class="detail-section-label">Recensione</div>
+            <div class="detail-section-label" id="detail-commento-label">Recensione</div>
             <div class="detail-commento" id="detail-commento"></div>
           </div>
           <div id="detail-pros-cons-wrap" class="detail-section hidden">
@@ -171,9 +171,11 @@
             <button type="button" class="heart-toggle" id="edit-liked" aria-label="Preferito" aria-pressed="false"></button>
           </div>
 
-          <label class="edit-label">Voto</label>
-          <div id="edit-rating" class="stars star-picker" role="slider" tabindex="0"
-               aria-label="Voto" aria-valuemin="0" aria-valuemax="5"></div>
+          <div id="edit-rating-block">
+            <label class="edit-label">Voto</label>
+            <div id="edit-rating" class="stars star-picker" role="slider" tabindex="0"
+                 aria-label="Voto" aria-valuemin="0" aria-valuemax="5"></div>
+          </div>
 
           <div class="edit-row">
             <div class="edit-col">
@@ -198,10 +200,10 @@
           <label class="edit-label">Metadata <span class="edit-hint">(anno • autore • genere)</span></label>
           <input type="text" id="edit-metadata" class="edit-input" />
 
-          <label class="edit-label">Recensione</label>
+          <label class="edit-label" id="edit-commento-label">Recensione</label>
           <textarea id="edit-commento" class="edit-input edit-textarea" rows="5"></textarea>
 
-          <div class="edit-row">
+          <div class="edit-row" id="edit-pc-block">
             <div class="edit-col">
               <label class="edit-label">Pro</label>
               <div id="edit-pros-list" class="edit-pc-list"></div>
@@ -228,12 +230,16 @@
   <div id="entry-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-box">
       <div class="modal-header">
-        <div class="modal-title">Nuova voce</div>
+        <div class="modal-title" id="entry-title">Nuova voce</div>
         <button class="icon-btn" id="entry-close-btn" aria-label="Chiudi">
           <i data-lucide="x"></i>
         </button>
       </div>
       <div class="entry-body">
+        <div id="entry-rating-row" class="entry-rating-row hidden">
+          <div id="entry-rating" class="stars star-picker" role="slider" tabindex="0"
+               aria-label="Voto" aria-valuemin="0" aria-valuemax="5"></div>
+        </div>
         <textarea id="entry-textarea" class="entry-textarea" placeholder="Scrivi qui..." rows="5"></textarea>
         <div class="entry-liked-row">
           <button type="button" class="heart-toggle" id="entry-liked" aria-label="Preferito" aria-pressed="false"></button>
