@@ -167,3 +167,5 @@
 .review-card[data-cat="SERIE"] .liked-mark { color: var(--serie-accent); }
 .review-card[data-cat="GAME"]  .liked-mark { color: var(--game-accent); }
 .review-card[data-cat="COMIC"] .liked-mark { color: var(--comic-accent); }
+
+.refresh-failed { width: calc(100% - 32px); text-align: left; font-size: 0.84rem; font-weight: 500; color: var(--ink-dim); cursor: pointer; }

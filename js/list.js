@@ -4,16 +4,30 @@
 
 let _allReviews  = [];
 
+// Primo caricamento: scheletri ed errore a tutta lista. Aggiornamenti: la lista attuale resta
+// visibile finché non arrivano i dati nuovi, e se falliscono non si perde niente.
 async function loadAllReviews() {
-  _showSkeletons();
+  const first = _allReviews.length === 0;
+  if (first) _showSkeletons();
   try {
     const data = await apiPost("reviews_get_all");
-    _allReviews = data.reviews || [];
+    if (!Array.isArray(data.reviews)) throw new Error(data.message || "risposta senza recensioni");
+    _allReviews = data.reviews;
     _render(true);
   } catch(e) {
     console.error("loadAllReviews:", e);
-    document.getElementById("reviews-list").innerHTML =
-      '<div class="empty-state">Errore caricamento.<br>Riprova.</div>';
+    const list = document.getElementById("reviews-list");
+    if (first) {
+      list.innerHTML = '<div class="empty-state">Errore caricamento.<br>Riprova.</div>';
+      return;
+    }
+    _render(false);   // rimette le card (toglie l'eventuale card "sto salvando")
+    const note = document.createElement("button");
+    note.type = "button";
+    note.className = "entry-loading-card refresh-failed";
+    note.textContent = "Non riesco ad aggiornare la lista · tocca per riprovare";
+    note.addEventListener("click", refreshReviews);
+    list.prepend(note);
   }
 }
 
@@ -22,7 +36,7 @@ function _showSkeletons() {
     Array.from({ length: 5 }).map(() => '<div class="skeleton-card"></div>').join("");
 }
 
-function refreshReviews() { loadAllReviews(); }
+function refreshReviews() { return loadAllReviews(); }
 
 function _render(animate) {
   const state = typeof _currentState !== "undefined" ? _currentState : "reviews";

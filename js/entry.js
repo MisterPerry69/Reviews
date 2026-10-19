@@ -111,11 +111,12 @@ async function submitEntry() {
     const res = promote ? await apiPost("reviews_complete", { id: promote.id, text, rating, liked })
               : dlc     ? await apiPost("dlc_add", { parent_id: dlc.id, name, text, rating, liked })
               :           await apiPost("reviews_process", { text, liked });
-    loadCard.remove();
     if (res.status === "SUCCESS") {
-      // Ricarica completa per avere l'ID reale dal Sheet
-      setTimeout(() => refreshReviews(), 1500);
+      // La card resta finché la lista ricaricata (con l'ID reale dal foglio) non la sostituisce
+      loadCard.querySelector(".entry-loading-text").textContent = "Salvato, aggiorno la lista…";
+      refreshReviews();
     } else {
+      loadCard.remove();
       restore(res.message || "errore");
     }
   } catch(e) {
