@@ -4,6 +4,7 @@
 
 let _entryLiked = null, _entryStars = null;
 let _entryPromote = null;   // voce wish/in corso da completare (null = nuova voce)
+let _entryDlc = null;       // gioco a cui aggiungere un DLC
 
 function _showEntry() {
   document.getElementById("entry-modal").classList.remove("hidden");
@@ -13,6 +14,8 @@ function _showEntry() {
 
 function openEntry(prefill) {
   _entryPromote = null;
+  _entryDlc = null;
+  document.getElementById("entry-name").classList.add("hidden");
   const modal = document.getElementById("entry-modal");
   modal.style.removeProperty("--current-accent");
   document.getElementById("entry-title").textContent = "Nuova voce";
@@ -26,6 +29,8 @@ function openEntry(prefill) {
 // Completa una voce wish/in corso: stesso box, con stelle, sulla STESSA riga del foglio
 function openPromote(review) {
   _entryPromote = review;
+  _entryDlc = null;
+  document.getElementById("entry-name").classList.add("hidden");
   const modal = document.getElementById("entry-modal");
   const tok = CAT_TOKENS[getCleanCat(review)] || CAT_TOKENS.ALL;
   modal.style.setProperty("--current-accent", tok.accent);
@@ -39,11 +44,30 @@ function openPromote(review) {
   _showEntry();
 }
 
+// DLC di un gioco: nome + recensione + stelle; diventa una recensione a sé legata al gioco
+function openDlc(game) {
+  _entryPromote = null;
+  _entryDlc = game;
+  document.getElementById("entry-modal").style.setProperty("--current-accent", CAT_TOKENS.GAME.accent);
+  document.getElementById("entry-title").textContent = "Nuovo DLC · " + game.titolo;
+  const name = document.getElementById("entry-name");
+  name.classList.remove("hidden");
+  name.value = "";
+  document.getElementById("entry-rating-row").classList.remove("hidden");
+  document.getElementById("entry-textarea").placeholder = "Com'era il DLC?";
+  document.getElementById("entry-textarea").value = "";
+  _entryStars.set(0);
+  _entryLiked.set(false);
+  _showEntry();
+  setTimeout(() => name.focus(), 90);
+}
+
 function closeEntry() {
   document.getElementById("entry-modal").classList.add("hidden");
   document.getElementById("entry-textarea").value = "";
   document.body.style.overflow = "";
   _entryPromote = null;
+  _entryDlc = null;
 }
 
 async function submitEntry() {
@@ -52,7 +76,10 @@ async function submitEntry() {
   if (!text) return;
   const liked   = _entryLiked.get();
   const promote = _entryPromote;
+  const dlc     = _entryDlc;
   const rating  = _entryStars.get();
+  const name    = document.getElementById("entry-name").value.trim();
+  if (dlc && !name) { document.getElementById("entry-name").focus(); return; }
 
   const btn  = document.getElementById("entry-submit-btn");
   btn.disabled = true;
@@ -72,17 +99,18 @@ async function submitEntry() {
 
   // Salvataggio fallito: il testo torna nel box, non si perde
   function restore(msg) {
-    promote ? openPromote(promote) : openEntry();
+    promote ? openPromote(promote) : dlc ? openDlc(dlc) : openEntry();
     textarea.value = text;
+    document.getElementById("entry-name").value = name;
     _entryStars.set(rating);
     _entryLiked.set(liked);
     alert("Non sono riuscito a salvare: " + msg + "\n\nTi ho rimesso il testo nel box.");
   }
 
   try {
-    const res = promote
-      ? await apiPost("reviews_complete", { id: promote.id, text, rating, liked })
-      : await apiPost("reviews_process", { text, liked });
+    const res = promote ? await apiPost("reviews_complete", { id: promote.id, text, rating, liked })
+              : dlc     ? await apiPost("dlc_add", { parent_id: dlc.id, name, text, rating, liked })
+              :           await apiPost("reviews_process", { text, liked });
     loadCard.remove();
     if (res.status === "SUCCESS") {
       // Ricarica completa per avere l'ID reale dal Sheet

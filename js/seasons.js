@@ -1,7 +1,8 @@
 /* ============================================
-   rank★d — Serie: stagioni e puntate
-   Puntata = stelle + cuore + nota (salvate da sole, niente AI)
+   rank★d — Serie: stagioni e puntate · Fumetti: run e albi
+   Puntata/albo = stelle + cuore + nota (salvate da sole, niente AI)
    Stagione = media puntate + recensione scritta (AI); serie = media stagioni
+   Run a fumetti = un solo livello (stagione 1 sul backend): voto = media albi
    ============================================ */
 
 let _seasonCtx = null;      // { review, season } della stagione aperta
@@ -16,9 +17,14 @@ function _fmtAvg(v) { return v > 0 ? v.toFixed(1).replace(".", ",") : "—"; }
 async function loadSeasons(review) {
   const box  = document.getElementById("detail-seasons");
   const list = document.getElementById("detail-seasons-list");
-  const show = getCleanCat(review) === "SERIE" && !isWish(review);
+  const cat  = getCleanCat(review);
+  const game = cat === "GAME" && !isDlc(review);
+  const show = (cat === "SERIE" || cat === "COMIC" || game) && !isWish(review);
   box.classList.toggle("hidden", !show);
   if (!show) return;
+  document.getElementById("detail-seasons-label").textContent = cat === "COMIC" ? "Albi" : game ? "DLC" : "Stagioni";
+  if (cat === "COMIC") return _loadIssues(review);
+  if (game) return _renderDlcs(review);
 
   if (_seriesCache[review.id]) return _renderSeasons(review, _seriesCache[review.id]);
 
@@ -37,6 +43,57 @@ async function loadSeasons(review) {
     _renderSeasons(review, seasons);
   } catch(e) {
     if (_detailReview === review) list.innerHTML = `<div class="seasons-empty">Stagioni non disponibili: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+// Dopo una modifica del link: stagioni/albi di quella voce vanno riletti dal backend
+function forgetSeries(id) {
+  delete _seriesCache[id];
+  Object.keys(_seasonCache).forEach(k => { if (k.indexOf(id + ":") === 0) delete _seasonCache[k]; });
+}
+
+/* ── Giochi: i DLC sono recensioni a parte, elencate qui (voto del gioco invariato) ── */
+function _renderDlcs(game) {
+  const list = document.getElementById("detail-seasons-list");
+  const dlcs = _allReviews.filter(r => r.parent_id === game.id);
+  list.innerHTML = dlcs.map(d => `
+      <button type="button" class="season-row" data-id="${escapeHtml(d.id)}">
+        <span class="season-main">
+          <span class="season-name">${escapeHtml(d.titolo)}</span>
+          <span class="season-sub">${escapeHtml(d.riassunto || "")}</span>
+        </span>
+        ${d.liked ? `<span class="liked-mark">${heartSvg()}</span>` : ""}
+        <span class="season-rate stars">${renderStars(d.rating)}</span>
+      </button>`).join("") +
+    '<button type="button" class="btn-pc-add" id="dlc-add-btn">+ Aggiungi DLC</button>';
+  list.querySelectorAll(".season-row").forEach(b => b.addEventListener("click", () =>
+    openDetail(_allReviews.find(r => r.id === b.dataset.id))));
+  document.getElementById("dlc-add-btn").addEventListener("click", () => { closeDetail(); openDlc(game); });
+}
+
+/* ── Fumetti: albi direttamente nel dettaglio della run ── */
+async function _loadIssues(review) {
+  const list = document.getElementById("detail-seasons-list");
+  const key  = review.id + ":1";
+  const show = data => {
+    review._seriesRated = data.episodes.some(e => e.rating > 0);
+    _renderEpisodes(data.episodes, list, { review, season: 1, eps: [], comic: true });
+  };
+  if (_seasonCache[key]) return show(_seasonCache[key]);
+
+  list.innerHTML = '<div class="seasons-empty">Carico gli albi…</div>';
+  try {
+    const res = await apiPost("season_get", { id: review.id, season: 1 });
+    if (_detailReview !== review) return;
+    if (res.status !== "SUCCESS") throw new Error(res.message || "errore");
+    if (!(res.episodes || []).length) {
+      list.innerHTML = `<div class="seasons-empty">${escapeHtml(res.message || "Nessun albo trovato su ComicVine")}</div>`;
+      return;
+    }
+    _seasonCache[key] = { episodes: res.episodes, review: null };
+    show(_seasonCache[key]);
+  } catch(e) {
+    if (_detailReview === review) list.innerHTML = `<div class="seasons-empty">Albi non disponibili: ${escapeHtml(e.message)}</div>`;
   }
 }
 
@@ -73,7 +130,7 @@ async function openSeason(review, season, name) {
   const key = review.id + ":" + season;
   if (_seasonCache[key]) {
     _renderSeasonReview(_seasonCache[key].review);
-    _renderEpisodes(_seasonCache[key].episodes);    // stessi oggetti che i voti modificano: la cache resta aggiornata
+    _renderEpisodes(_seasonCache[key].episodes, null, ctx);   // stessi oggetti che i voti modificano: la cache resta aggiornata
     return;
   }
 
@@ -83,7 +140,7 @@ async function openSeason(review, season, name) {
     if (res.status !== "SUCCESS") throw new Error(res.message || "errore");
     _seasonCache[key] = { episodes: res.episodes || [], review: res.review };
     _renderSeasonReview(res.review);
-    _renderEpisodes(_seasonCache[key].episodes);
+    _renderEpisodes(_seasonCache[key].episodes, null, ctx);
   } catch(e) {
     if (_seasonCtx === ctx) document.getElementById("season-episodes").innerHTML =
       `<div class="seasons-empty">Puntate non disponibili: ${escapeHtml(e.message)}</div>`;
@@ -165,25 +222,27 @@ function _seasonWriteForm(rev) {
 }
 
 /* ── Puntate ── */
-function _renderEpisodes(eps) {
-  const box = document.getElementById("season-episodes");
+// box = dove disegnare (null = vista stagione); ctx.comic = albi di una run
+function _renderEpisodes(eps, box, ctx) {
+  box = box || document.getElementById("season-episodes");
   if (!eps.length) { box.innerHTML = '<div class="seasons-empty">Nessuna puntata su TMDB</div>'; return; }
   box.innerHTML = "";
-  const ctx = _seasonCtx;
   ctx.eps = eps;
+  const unit = ctx.comic ? "albo" : "puntata";
+  const notes = [];
   eps.forEach(ep => {
     const row = document.createElement("div");
     row.className = "ep-row";
     row.innerHTML = `
       <div class="ep-head">
-        <span class="ep-num">${ep.episode}</span>
-        <span class="ep-title">${escapeHtml(ep.title || "Puntata " + ep.episode)}</span>
-        <button type="button" class="ep-note-btn" aria-label="Nota alla puntata ${ep.episode}"><i data-lucide="pencil"></i></button>
-        <button type="button" class="heart-toggle ep-heart" aria-label="Puntata ${ep.episode} preferita" aria-pressed="false"></button>
+        <span class="ep-num">${ctx.comic ? "#" : ""}${escapeHtml(ep.episode)}</span>
+        <span class="ep-title">${escapeHtml(ep.title || (ctx.comic ? "Albo #" : "Puntata ") + ep.episode)}</span>
+        <button type="button" class="ep-note-btn" aria-label="Nota, ${unit} ${escapeHtml(ep.episode)}"><i data-lucide="pencil"></i></button>
+        <button type="button" class="heart-toggle ep-heart" aria-label="Preferito, ${unit} ${escapeHtml(ep.episode)}" aria-pressed="false"></button>
       </div>
       <div class="stars star-picker ep-stars" role="slider" tabindex="0"
-           aria-label="Voto puntata ${ep.episode}" aria-valuemin="0" aria-valuemax="5"></div>
-      <input type="text" class="edit-input ep-note${ep.note ? "" : " hidden"}" maxlength="300" placeholder="Nota…">`;
+           aria-label="Voto ${unit} ${escapeHtml(ep.episode)}" aria-valuemin="0" aria-valuemax="5"></div>
+      <textarea class="edit-input ep-note${ep.note ? "" : " hidden"}" rows="1" maxlength="300" placeholder="Nota…"></textarea>`;
     box.appendChild(row);
 
     const save = () => _queueEpisodeSave(ctx, ep);
@@ -191,11 +250,20 @@ function _renderEpisodes(eps) {
     initHeartToggle(row.querySelector(".ep-heart"), on => { ep.liked = on; save(); }).set(ep.liked);
     const note = row.querySelector(".ep-note");
     note.value = ep.note;
+    note.addEventListener("input", () => _fitNote(note));
     note.addEventListener("change", () => { ep.note = note.value.trim(); save(); });
-    row.querySelector(".ep-note-btn").addEventListener("click", () => { note.classList.remove("hidden"); note.focus(); });
+    row.querySelector(".ep-note-btn").addEventListener("click", () => { note.classList.remove("hidden"); _fitNote(note); note.focus(); });
+    notes.push(note);
   });
-  _setSeasonAvg(_localAvg(eps));
+  notes.forEach(_fitNote);   // dopo l'inserimento nel DOM, quando l'altezza è misurabile
+  if (_seasonCtx === ctx) _setSeasonAvg(_localAvg(eps));
   if (window.lucide) lucide.createIcons({ nodes: [box] });
+}
+
+// La nota mostra sempre tutto il testo: l'altezza segue il contenuto
+function _fitNote(ta) {
+  ta.style.height = "auto";
+  ta.style.height = ta.scrollHeight + 2 + "px";
 }
 
 // Stessa regola del backend: media delle puntate votate, a un decimale
@@ -226,7 +294,7 @@ function _queueEpisodeSave(ctx, ep) {
         }
       }
     } catch(e) {
-      alert("Puntata " + ep.episode + " non salvata: " + e.message);
+      alert((ctx.comic ? "Albo #" : "Puntata ") + ep.episode + " non salvato: " + e.message);
     }
   }, 700);
 }

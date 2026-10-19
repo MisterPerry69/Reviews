@@ -37,6 +37,15 @@ function openDetail(review) {
     heroPh.textContent = CAT_EMOJI[cat] || "🎭";
   }
 
+  /* DLC: torna al gioco */
+  const parent = isDlc(review) ? _allReviews.find(x => x.id === review.parent_id) : null;
+  const parentBtn = document.getElementById("detail-parent-btn");
+  parentBtn.classList.toggle("hidden", !parent);
+  if (parent) {
+    document.getElementById("detail-parent-label").textContent = parent.titolo;
+    parentBtn.onclick = () => openDetail(parent);
+  }
+
   /* Titolo */
   document.getElementById("detail-title").textContent = review.titolo || "";
 
@@ -57,7 +66,7 @@ function openDetail(review) {
 
   /* Badge */
   const badgeEl = document.getElementById("detail-cat-badge");
-  badgeEl.textContent = cat;
+  badgeEl.textContent = isDlc(review) ? "DLC" : cat;
   badgeEl.className   = "cat-badge" + (wish ? " wish" : progress ? " progress" : "");
 
   /* Metadata e data */
@@ -102,7 +111,8 @@ function openDetail(review) {
   const regenBtn = document.getElementById("detail-regen-btn");
   regenBtn.classList.toggle("hidden", !(review.raw_text && review.raw_text.trim()));
 
-  /* Parti sempre in view mode; per le serie carica le stagioni */
+  /* Parti sempre in view mode, dall'alto; per le serie carica le stagioni */
+  document.querySelector("#detail-modal .detail-body").scrollTop = 0;
   document.getElementById("detail-season").classList.add("hidden");
   exitEditMode();
   loadSeasons(review);
@@ -165,6 +175,9 @@ function enterEditMode() {
   document.getElementById("edit-stato").value    = isWish(r) ? "WISH" : isProgress(r) ? "IN_PROGRESS" : "";
   _syncEditStato();
   document.getElementById("edit-metadata").value = r.metadata || "";
+  document.getElementById("edit-link").value     = r.link || "";
+  document.getElementById("edit-poster").value   = r.image_url || "";
+  _previewPoster();
   document.getElementById("edit-commento").value = r.commento || "";
 
   let pros = [], cons = [];
@@ -186,6 +199,13 @@ function _syncEditStato() {
   document.getElementById("edit-rating-block").classList.toggle("hidden", note || auto);
   document.getElementById("edit-pc-block").classList.toggle("hidden", note);
   document.getElementById("edit-commento-label").textContent = note ? "Note" : "Recensione";
+}
+
+function _previewPoster() {
+  const url = document.getElementById("edit-poster").value.trim();
+  const img = document.getElementById("edit-poster-preview");
+  img.classList.toggle("hidden", !url);
+  if (url) img.src = url;
 }
 
 function exitEditMode() {
@@ -214,6 +234,8 @@ async function saveEdit() {
     liked:     _editLiked.get(),
     commento:  document.getElementById("edit-commento").value.trim(),
     metadata:  document.getElementById("edit-metadata").value.trim(),
+    link:      document.getElementById("edit-link").value.trim(),
+    image_url: document.getElementById("edit-poster").value.trim(),
     pros:      stato ? [] : _collectPC("pros"),
     cons:      stato ? [] : _collectPC("cons")
   };
@@ -226,6 +248,7 @@ async function saveEdit() {
   try {
     const res = await apiPost("reviews_update", payload);
     if (res.status !== "SUCCESS") throw new Error(res.message || "Errore");
+    forgetSeries(payload.id);   // il link può puntare a un'altra serie/run: stagioni e albi vanno riletti
     closeDetail();
     refreshReviews();
   } catch(e) {
@@ -263,6 +286,7 @@ document.addEventListener("DOMContentLoaded", () => {
   _editStars = initStarPicker(document.getElementById("edit-rating"));
   _editLiked = initHeartToggle(document.getElementById("edit-liked"));
   document.getElementById("edit-stato").addEventListener("change", _syncEditStato);
+  document.getElementById("edit-poster").addEventListener("input", _previewPoster);
   document.getElementById("detail-close-btn").addEventListener("click", closeDetail);
 
   document.getElementById("detail-modal").addEventListener("click", e => {

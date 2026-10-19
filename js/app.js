@@ -40,6 +40,7 @@ function getCleanCat(r) {
 }
 function isWish(r)     { return (r.categoria || "").toUpperCase().includes("WISH"); }
 function isProgress(r) { return (r.categoria || "").toUpperCase().includes("IN_PROGRESS"); }
+function isDlc(r)      { return !!r.parent_id; }
 
 /* Stelle SVG: piena / mezza / vuota */
 function _starSvg(kind) {

@@ -126,6 +126,9 @@
 
         <!-- ░░ VIEW MODE ░░ -->
         <div id="detail-view">
+          <button type="button" class="season-back hidden" id="detail-parent-btn">
+            <i data-lucide="chevron-left"></i><span id="detail-parent-label"></span>
+          </button>
           <div class="detail-title" id="detail-title"></div>
           <div class="detail-meta-row">
             <span class="cat-badge" id="detail-cat-badge"></span>
@@ -151,7 +154,7 @@
             </div>
           </div>
           <div id="detail-seasons" class="detail-section hidden">
-            <div class="detail-section-label">Stagioni</div>
+            <div class="detail-section-label" id="detail-seasons-label">Stagioni</div>
             <div id="detail-seasons-list" class="seasons-list"></div>
           </div>
           <button class="btn-promote hidden" id="detail-promote-btn">Promuovi a Recensione</button>
@@ -203,6 +206,15 @@
 
           <label class="edit-label">Metadata <span class="edit-hint">(anno • autore • genere)</span></label>
           <input type="text" id="edit-metadata" class="edit-input" />
+
+          <label class="edit-label">Link <span class="edit-hint">(pagina TMDB, ComicVine o RAWG da cui prendere i dati)</span></label>
+          <input type="url" id="edit-link" class="edit-input" placeholder="https://www.themoviedb.org/…" />
+
+          <label class="edit-label">Poster <span class="edit-hint">(link a un'immagine)</span></label>
+          <div class="edit-poster-row">
+            <img id="edit-poster-preview" class="edit-poster-preview" alt="" />
+            <input type="url" id="edit-poster" class="edit-input" placeholder="https://…" />
+          </div>
 
           <label class="edit-label" id="edit-commento-label">Recensione</label>
           <textarea id="edit-commento" class="edit-input edit-textarea" rows="5"></textarea>
@@ -260,6 +272,7 @@
         </button>
       </div>
       <div class="entry-body">
+        <input type="text" id="entry-name" class="entry-name hidden" maxlength="80" placeholder="Nome del DLC" />
         <div id="entry-rating-row" class="entry-rating-row hidden">
           <div id="entry-rating" class="stars star-picker" role="slider" tabindex="0"
                aria-label="Voto" aria-valuemin="0" aria-valuemax="5"></div>

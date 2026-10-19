@@ -67,7 +67,7 @@ function _renderCard(r) {
   const badge = wish     ? '<span class="review-poster-badge wish">Wish</span>'
               : progress ? '<span class="review-poster-badge progress">In corso</span>'
               : "";
-  const metaLabel = wish ? "Wish" : progress ? "In corso" : cat;
+  const metaLabel = wish ? "Wish" : progress ? "In corso" : isDlc(r) ? "DLC" : cat;
 
   return `
     <div class="review-card" data-id="${escapeHtml(r.id)}" data-cat="${escapeHtml(cat)}">
