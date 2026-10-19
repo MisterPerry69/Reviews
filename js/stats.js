@@ -4,12 +4,13 @@
 
 function renderStats(allReviews) {
   const reviews  = allReviews.filter(r => !isWish(r) && !isProgress(r));
+  const rated    = reviews.filter(r => r.rating > 0);   // senza voto non abbassa la media
   const wishlist = allReviews.filter(r => isWish(r));
   const progress = allReviews.filter(r => isProgress(r));
 
   // Hero
-  const avgRating = reviews.length > 0
-    ? (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length).toFixed(1)
+  const avgRating = rated.length > 0
+    ? (rated.reduce((s, r) => s + r.rating, 0) / rated.length).toFixed(1)
     : "—";
 
   document.getElementById("stats-total").textContent    = reviews.length;
@@ -20,19 +21,19 @@ function renderStats(allReviews) {
   // Per categoria
   const cats = ["FILM", "SERIE", "GAME", "COMIC"];
   const catStats = {};
-  cats.forEach(c => { catStats[c] = { count: 0, total: 0 }; });
+  cats.forEach(c => { catStats[c] = { count: 0, total: 0, rated: 0 }; });
 
   reviews.forEach(r => {
     const cat = getCleanCat(r);
-    if (!catStats[cat]) catStats[cat] = { count: 0, total: 0 };
+    if (!catStats[cat]) catStats[cat] = { count: 0, total: 0, rated: 0 };
     catStats[cat].count++;
-    catStats[cat].total += r.rating || 0;
+    if (r.rating > 0) { catStats[cat].rated++; catStats[cat].total += r.rating; }
   });
 
   const catList = document.getElementById("stats-cat-list");
   catList.innerHTML = cats.filter(c => catStats[c].count > 0).map(cat => {
     const s   = catStats[cat];
-    const avg = s.count > 0 ? (s.total / s.count).toFixed(1) : "—";
+    const avg = s.rated > 0 ? (s.total / s.rated).toFixed(1) : "—";
     return `
       <div class="stats-cat-row">
         <div class="stats-cat-emoji">${CAT_EMOJI[cat] || "🎭"}</div>
@@ -45,8 +46,7 @@ function renderStats(allReviews) {
   }).join("") || '<div class="empty-state">Nessuna recensione</div>';
 
   // Top 5 per rating
-  const top = [...reviews]
-    .filter(r => r.rating > 0)
+  const top = [...rated]
     .sort((a, b) => b.rating - a.rating)
     .slice(0, 5);
 

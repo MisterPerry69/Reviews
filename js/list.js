@@ -3,16 +3,12 @@
    ============================================ */
 
 let _allReviews  = [];
-let _searchQuery = "";
-
-window._allReviewsCache = _allReviews;
 
 async function loadAllReviews() {
   _showSkeletons();
   try {
     const data = await apiPost("reviews_get_all");
     _allReviews = data.reviews || [];
-    window._allReviewsCache = _allReviews;
     _render(true);
   } catch(e) {
     console.error("loadAllReviews:", e);
@@ -39,15 +35,6 @@ function _render(animate) {
   else                           items = items.filter(r => !isWish(r) && !isProgress(r));
 
   if (cat !== "ALL") items = items.filter(r => getCleanCat(r) === cat);
-
-  if (_searchQuery) {
-    const q = _searchQuery.toLowerCase();
-    items = items.filter(r =>
-      (r.titolo    || "").toLowerCase().includes(q) ||
-      (r.commento  || "").toLowerCase().includes(q) ||
-      (r.metadata  || "").toLowerCase().includes(q) ||
-      (r.riassunto || "").toLowerCase().includes(q));
-  }
 
   const list = document.getElementById("reviews-list");
 

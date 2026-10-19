@@ -30,7 +30,8 @@ function openPromote(review) {
   const tok = CAT_TOKENS[getCleanCat(review)] || CAT_TOKENS.ALL;
   modal.style.setProperty("--current-accent", tok.accent);
   document.getElementById("entry-title").textContent = "Com'era " + review.titolo + "?";
-  document.getElementById("entry-rating-row").classList.remove("hidden");
+  // Serie con puntate votate: il voto è la media delle stagioni, le stelle qui non servono
+  document.getElementById("entry-rating-row").classList.toggle("hidden", !!review._seriesRated);
   document.getElementById("entry-textarea").placeholder = "Dì la tua…";
   document.getElementById("entry-textarea").value = "";
   _entryStars.set(0);
@@ -69,37 +70,30 @@ async function submitEntry() {
   loadCard.innerHTML = '<div class="spinner"></div><div class="entry-loading-text">L\'AI sta analizzando la tua recensione…</div>';
   listEl.prepend(loadCard);
 
+  // Salvataggio fallito: il testo torna nel box, non si perde
+  function restore(msg) {
+    promote ? openPromote(promote) : openEntry();
+    textarea.value = text;
+    _entryStars.set(rating);
+    _entryLiked.set(liked);
+    alert("Non sono riuscito a salvare: " + msg + "\n\nTi ho rimesso il testo nel box.");
+  }
+
   try {
     const res = promote
       ? await apiPost("reviews_complete", { id: promote.id, text, rating, liked })
       : await apiPost("reviews_process", { text, liked });
     loadCard.remove();
-    if (promote && res.status !== "SUCCESS") alert("Non sono riuscito a salvare: " + (res.message || "errore") + "\n\nIl testo era:\n" + text);
-
-    if (res.status === "SUCCESS" && res.data) {
-      const r = res.data;
-      const newReview = {
-        id:        "pending-" + Date.now(),
-        data:      new Date().toISOString().slice(0, 10),
-        titolo:    r.titolo    || "",
-        categoria: r.categoria || "ALTRO",
-        rating:    r.rating    || 0,
-        commento:  r.commento || "",
-        image_url: r.image_url || "",
-        riassunto: r.commento_breve || "",
-        metadata:  r.metadata  || "",
-        pros:      JSON.stringify(r.pros || []),
-        cons:      JSON.stringify(r.cons || [])
-      };
+    if (res.status === "SUCCESS") {
       // Ricarica completa per avere l'ID reale dal Sheet
       setTimeout(() => refreshReviews(), 1500);
     } else {
-      refreshReviews();
+      restore(res.message || "errore");
     }
   } catch(e) {
     console.error("submitEntry error:", e);
     loadCard.remove();
-    refreshReviews();
+    restore(e.message);
   }
 
   btn.innerHTML = origHTML;

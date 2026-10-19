@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="css/detail.css" />
   <link rel="stylesheet" href="css/entry.css" />
   <link rel="stylesheet" href="css/stats.css" />
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://unpkg.com/lucide@1.59.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 
@@ -150,6 +150,10 @@
               </div>
             </div>
           </div>
+          <div id="detail-seasons" class="detail-section hidden">
+            <div class="detail-section-label">Stagioni</div>
+            <div id="detail-seasons-list" class="seasons-list"></div>
+          </div>
           <button class="btn-promote hidden" id="detail-promote-btn">Promuovi a Recensione</button>
 
           <!-- Azioni: modifica / rigenera -->
@@ -222,6 +226,26 @@
           </div>
         </div>
 
+        <!-- ░░ STAGIONE (dentro la serie) ░░ -->
+        <div id="detail-season" class="hidden">
+          <button type="button" class="season-back" id="season-back-btn">
+            <i data-lucide="chevron-left"></i><span id="season-back-label"></span>
+          </button>
+          <div class="detail-title season-title" id="season-title"></div>
+          <div class="detail-meta-row">
+            <span class="detail-rating stars" id="season-rating"></span>
+            <span class="season-avg" id="season-avg"></span>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-label">Recensione della stagione</div>
+            <div id="season-review"></div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-label">Puntate</div>
+            <div id="season-episodes" class="ep-list"></div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -261,6 +285,7 @@
   <script src="js/stats.js"></script>
   <script src="js/list.js"></script>
   <script src="js/detail.js"></script>
+  <script src="js/seasons.js"></script>
   <script src="js/entry.js"></script>
 </body>
 </html>

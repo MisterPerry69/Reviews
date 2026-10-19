@@ -102,8 +102,10 @@ function openDetail(review) {
   const regenBtn = document.getElementById("detail-regen-btn");
   regenBtn.classList.toggle("hidden", !(review.raw_text && review.raw_text.trim()));
 
-  /* Parti sempre in view mode */
+  /* Parti sempre in view mode; per le serie carica le stagioni */
+  document.getElementById("detail-season").classList.add("hidden");
   exitEditMode();
+  loadSeasons(review);
 
   modal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -114,6 +116,8 @@ function closeDetail() {
   document.getElementById("detail-modal").classList.add("hidden");
   document.body.style.overflow = "";
   _detailReview = null;
+  _seasonCtx = null;
+  _render(false);   // il voto di una serie può essere cambiato votando le puntate
 }
 
 // Apre il box "Com'era?": la voce diventa recensione solo quando pubblichi
@@ -177,7 +181,9 @@ function enterEditMode() {
 // Wish/in corso: niente voto né pro/contro, il testo è una nota
 function _syncEditStato() {
   const note = !!document.getElementById("edit-stato").value;
-  document.getElementById("edit-rating-block").classList.toggle("hidden", note);
+  // Serie con puntate votate: il voto è la media delle stagioni, non si modifica a mano
+  const auto = !!(_detailReview && _detailReview._seriesRated);
+  document.getElementById("edit-rating-block").classList.toggle("hidden", note || auto);
   document.getElementById("edit-pc-block").classList.toggle("hidden", note);
   document.getElementById("edit-commento-label").textContent = note ? "Note" : "Recensione";
 }

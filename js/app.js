@@ -63,9 +63,11 @@ function renderStars(rating) {
 }
 
 /* Stelle interattive (stile Letterboxd):
-   tap su una stella → piena, di nuovo → mezza, di nuovo → vuota; trascina per riempire */
-function initStarPicker(el) {
+   tap su una stella → piena, di nuovo → mezza, di nuovo → vuota; trascina per riempire.
+   onChange (opzionale) scatta solo per i cambi fatti dall'utente, non per set() da codice */
+function initStarPicker(el, onChange) {
   let value = 0;
+  const changed = () => { if (onChange) onChange(value); };
   function set(v) {
     value = Math.max(0, Math.min(5, v));
     el.innerHTML = renderStars(value);
@@ -95,14 +97,15 @@ function initStarPicker(el) {
   el.addEventListener("pointerup", e => {
     if (!active) return;
     active = false;
-    if (dragging) return;
+    if (dragging) return changed();
     const i = Math.ceil(fromX(e.clientX));
     set(value === i ? i - 0.5 : value === i - 0.5 ? i - 1 : i);
+    changed();
   });
   el.addEventListener("pointercancel", () => { active = false; });
   el.addEventListener("keydown", e => {
-    if (e.key === "ArrowRight" || e.key === "ArrowUp")   { set(value + 0.5); e.preventDefault(); }
-    if (e.key === "ArrowLeft"  || e.key === "ArrowDown") { set(value - 0.5); e.preventDefault(); }
+    if (e.key === "ArrowRight" || e.key === "ArrowUp")   { set(value + 0.5); changed(); e.preventDefault(); }
+    if (e.key === "ArrowLeft"  || e.key === "ArrowDown") { set(value - 0.5); changed(); e.preventDefault(); }
   });
 
   set(0);
@@ -113,12 +116,13 @@ function initStarPicker(el) {
 function heartSvg() {
   return `<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.6s-7.6-4.7-9.4-9.4C1.3 7.9 3.5 4.4 7.1 4.4c2 0 3.6 1.1 4.9 2.8 1.3-1.7 2.9-2.8 4.9-2.8 3.6 0 5.8 3.5 4.5 6.8-1.8 4.7-9.4 9.4-9.4 9.4z"/></svg>`;
 }
-function initHeartToggle(btn) {
+function initHeartToggle(btn, onChange) {
   btn.innerHTML = heartSvg();
   const set = on => btn.setAttribute("aria-pressed", on ? "true" : "false");
   btn.addEventListener("click", () => {
     set(btn.getAttribute("aria-pressed") !== "true");
     btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+    if (onChange) onChange(btn.getAttribute("aria-pressed") === "true");
   });
   set(false);
   return { get: () => btn.getAttribute("aria-pressed") === "true", set };
@@ -326,7 +330,7 @@ function setHeaderState(state) {
     deck.classList.add("hidden");
     statsView.classList.remove("hidden");
     tabs.classList.add("hidden");            // nascondi pillola categorie in stats
-    if (typeof renderStats === "function") renderStats(window._allReviewsCache || []);
+    if (typeof renderStats === "function") renderStats(_allReviews);
   } else {
     statsView.classList.add("hidden");
     deck.classList.remove("hidden");
