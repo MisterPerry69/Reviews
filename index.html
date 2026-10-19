@@ -300,6 +300,11 @@
   <div id="share-modal" class="modal-overlay share-overlay hidden" role="dialog" aria-modal="true" aria-label="Condividi">
     <div class="share-box">
       <img id="share-preview" class="share-preview" alt="Anteprima dell'immagine da condividere" />
+      <div class="share-avatar-row">
+        <button type="button" class="share-avatar-btn" id="share-avatar-btn">+ Aggiungi avatar</button>
+        <button type="button" class="share-avatar-btn hidden" id="share-avatar-remove">Rimuovi</button>
+        <input type="file" id="share-avatar-file" accept="image/*" hidden />
+      </div>
       <div class="share-actions">
         <button class="btn-entry-cancel" id="share-close-btn">Chiudi</button>
         <button class="btn-entry-cancel" id="share-save-btn">Salva</button>

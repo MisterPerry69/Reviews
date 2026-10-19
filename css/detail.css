@@ -383,3 +383,6 @@
 .share-actions { display: flex; gap: 10px; width: 100%; }
 .share-actions .btn-entry-cancel { background: rgba(255,255,255,0.12); color: #fff; }
 .share-actions .btn-entry-submit { --current-accent: #e0a050; }
+.share-avatar-row { display: flex; gap: 16px; margin-top: -4px; }
+.share-avatar-btn { font-size: 0.85rem; font-weight: 500; color: rgba(255,255,255,0.75); padding: 6px 4px; text-decoration: underline; text-underline-offset: 3px; }
+.share-avatar-btn:hover { color: #fff; }

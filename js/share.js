@@ -1,11 +1,13 @@
 /* ============================================
-   rank★d — Condividi: immagine 1080×1920 per le storie (poster, titolo, voto, logo)
+   rank★d — Condividi: immagine 3:4 (si vede intera nell'anteprima di WhatsApp)
+   con poster, titolo, voto, avatar (facoltativo, salvato sul dispositivo) e logo
    ============================================ */
 
-const SHARE_W = 1080, SHARE_H = 1920;
+const SHARE_W = 1086, SHARE_H = 1448;
 const STAR_PATH  = "M12 2.4l2.96 6 6.62.96-4.79 4.67 1.13 6.59L12 17.5 6.08 20.62l1.13-6.59L2.42 9.36 9.04 8.4 12 2.4z";
 const HEART_PATH = "M12 20.6s-7.6-4.7-9.4-9.4C1.3 7.9 3.5 4.4 7.1 4.4c2 0 3.6 1.1 4.9 2.8 1.3-1.7 2.9-2.8 4.9-2.8 3.6 0 5.8 3.5 4.5 6.8-1.8 4.7-9.4 9.4-9.4 9.4z";
-let _shareBlob = null, _shareName = "";
+const AVATAR_KEY = "rankd_avatar";
+let _shareBlob = null, _shareName = "", _shareReview = null;
 
 function _loadImg(src, cors) {
   return new Promise((resolve, reject) => {
@@ -26,6 +28,26 @@ async function _posterImage(url) {
     if (res.status === "SUCCESS") return await _loadImg(res.data_url, false);
   } catch(e) {}
   return null;
+}
+
+/* ── Avatar: niente utenti nell'app, quindi vive in localStorage su questo dispositivo ── */
+function _getAvatar() {
+  try { return localStorage.getItem(AVATAR_KEY); } catch(e) { return null; }
+}
+
+// Foto dalla galleria → quadrato 256px ritagliato al centro (piccolo abbastanza per localStorage)
+async function _setAvatarFromFile(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await _loadImg(url, false);
+    const side = Math.min(img.width, img.height);
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    c.getContext("2d").drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, 256, 256);
+    localStorage.setItem(AVATAR_KEY, c.toDataURL("image/jpeg", 0.85));
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 }
 
 function _roundRect(g, x, y, w, h, r) {
@@ -85,9 +107,13 @@ async function renderShareImage(r) {
   const g = c.getContext("2d");
   const cat = getCleanCat(r);
   const tok = CAT_TOKENS[cat] || CAT_TOKENS.ALL;
-  await Promise.all([document.fonts.load("600 72px Fredoka"), document.fonts.load("700 80px Fredoka"),
-                     document.fonts.load("600 34px Outfit")]).catch(() => {});
-  const img = await _posterImage(r.image_url);
+  await Promise.all([document.fonts.load("600 64px Fredoka"), document.fonts.load("600 30px Outfit")]).catch(() => {});
+  const avatarSrc = _getAvatar();
+  const [img, logo, avatar] = await Promise.all([
+    _posterImage(r.image_url),
+    _loadImg("logo.png", false).catch(() => null),
+    avatarSrc ? _loadImg(avatarSrc, false).catch(() => null) : null
+  ]);
 
   // Sfondo: poster sfocato e scurito, sfuma nel colore scuro della categoria
   g.fillStyle = tok.deep;
@@ -99,99 +125,95 @@ async function renderShareImage(r) {
     g.drawImage(img, (SHARE_W - img.width * s) / 2, (SHARE_H - img.height * s) / 2, img.width * s, img.height * s);
     g.restore();
   }
-  const grad = g.createLinearGradient(0, SHARE_H * 0.45, 0, SHARE_H);
+  const grad = g.createLinearGradient(0, SHARE_H * 0.4, 0, SHARE_H);
   grad.addColorStop(0, "rgba(0,0,0,0)");
   grad.addColorStop(1, tok.deep);
   g.fillStyle = grad;
   g.fillRect(0, 0, SHARE_W, SHARE_H);
 
-  // Misure del blocco centrale, per centrarlo in verticale
-  let pw = 0, ph = 0;
+  // Misure, per centrare il blocco in verticale
+  const AV = avatar ? 112 : 0;                       // l'avatar sta a cavallo del bordo alto del poster
+  let pw, ph;
   if (img) {
-    const s = Math.min(760 / img.width, 960 / img.height);   // i giochi hanno immagini orizzontali: niente ritaglio
+    const s = Math.min(900 / img.width, 760 / img.height);   // giochi orizzontali: interi, senza ritaglio
     pw = img.width * s; ph = img.height * s;
-  } else { pw = 560; ph = 560; }
-  g.font = "600 76px Fredoka";
-  const titleLines = _wrapLines(g, r.titolo || "", 900, 2);
+  } else { pw = 460; ph = 460; }
+  g.font = "600 64px Fredoka";
+  const titleLines = _wrapLines(g, r.titolo || "", 940, 2);
   const parent = isDlc(r) ? _allReviews.find(x => x.id === r.parent_id) : null;
   const year = (String(r.metadata || "").match(/\b(19|20)\d{2}\b/) || [""])[0];
   const kicker = (parent ? "DLC · " + parent.titolo : { FILM: "Film", SERIE: "Serie", GAME: "Videogioco", COMIC: "Fumetto" }[cat] || "")
                + (year && !parent ? " · " + year : "");
   const rated = !isWish(r) && !isProgress(r) && r.rating > 0;
-  const blockH = ph + 80 + 46 + titleLines.length * 88 + 36 + 80 + 110 + 40 + 90;
-  let y = Math.max(140, (SHARE_H - blockH) / 2);
+  const logoH = 84, logoW = logo ? logo.width * logoH / logo.height : 0;
+  const blockH = AV / 2 + ph + 44 + 34 + titleLines.length * 74 + 24 + 58 + 52 + logoH;
+  let y = Math.max(40, (SHARE_H - blockH) / 2) + AV / 2;
 
   // Poster
   const px = (SHARE_W - pw) / 2;
-  if (img) {
-    g.save();
-    g.shadowColor = "rgba(0,0,0,0.55)"; g.shadowBlur = 70; g.shadowOffsetY = 28;
-    _roundRect(g, px, y, pw, ph, 28); g.fillStyle = "#000"; g.fill();
-    g.restore();
-    g.save();
-    _roundRect(g, px, y, pw, ph, 28); g.clip();
-    g.drawImage(img, px, y, pw, ph);
-    g.restore();
-  } else {
-    g.save();
-    _roundRect(g, px, y, pw, ph, 28); g.fillStyle = "rgba(255,255,255,0.08)"; g.fill();
-    g.font = "260px serif"; g.textAlign = "center"; g.textBaseline = "middle";
+  g.save();
+  g.shadowColor = "rgba(0,0,0,0.55)"; g.shadowBlur = 60; g.shadowOffsetY = 24;
+  _roundRect(g, px, y, pw, ph, 26); g.fillStyle = img ? "#000" : "rgba(255,255,255,0.08)"; g.fill();
+  g.restore();
+  g.save();
+  _roundRect(g, px, y, pw, ph, 26); g.clip();
+  if (img) g.drawImage(img, px, y, pw, ph);
+  else {
+    g.font = "220px serif"; g.textAlign = "center"; g.textBaseline = "middle";
     g.fillText(CAT_EMOJI[cat] || "🎭", SHARE_W / 2, y + ph / 2);
+  }
+  g.restore();
+
+  // Avatar: cerchio con bordo, centrato sul bordo alto del poster
+  if (avatar) {
+    const cx = SHARE_W / 2, cy = y, rad = AV / 2;
+    g.save();
+    g.beginPath(); g.arc(cx, cy, rad + 6, 0, Math.PI * 2); g.fillStyle = tok.deep; g.fill();
+    g.beginPath(); g.arc(cx, cy, rad, 0, Math.PI * 2); g.clip();
+    g.drawImage(avatar, cx - rad, cy - rad, AV, AV);
     g.restore();
   }
-  y += ph + 80;
+  y += ph + 44;
 
   // Categoria · anno
   g.textAlign = "center"; g.textBaseline = "alphabetic";
-  g.font = "600 34px Outfit";
+  g.font = "600 30px Outfit";
   g.fillStyle = "rgba(255,255,255,0.6)";
-  g.fillText(kicker.toUpperCase(), SHARE_W / 2, y + 34);
-  y += 46;
+  g.fillText(kicker.toUpperCase(), SHARE_W / 2, y + 28);
+  y += 34;
 
   // Titolo
-  g.font = "600 76px Fredoka";
+  g.font = "600 64px Fredoka";
   g.fillStyle = "#fff";
-  titleLines.forEach(line => { y += 88; g.fillText(line, SHARE_W / 2, y); });
-  y += 36;
+  titleLines.forEach(line => { y += 74; g.fillText(line, SHARE_W / 2, y); });
+  y += 24;
 
   // Voto (o stato) + cuore
   if (rated) {
-    const size = 70, gap = 12, heart = r.liked ? size + 26 : 0;
+    const size = 58, gap = 10, heart = r.liked ? size + 22 : 0;
     let x = (SHARE_W - (5 * size + 4 * gap + heart)) / 2;
     for (let i = 1; i <= 5; i++) {
       _drawIcon(g, STAR_PATH, x, y, size, tok.accent, r.rating >= i ? 1 : r.rating >= i - 0.5 ? 0.5 : 0);
       x += size + gap;
     }
-    if (r.liked) _drawIcon(g, HEART_PATH, x + 14, y + 4, size - 8, tok.accent, 1);
+    if (r.liked) _drawIcon(g, HEART_PATH, x + 12, y + 3, size - 6, tok.accent, 1);
   } else {
-    g.font = "600 44px Outfit";
+    g.font = "600 40px Outfit";
     g.fillStyle = tok.accent;
-    g.fillText(isWish(r) ? "In wishlist" : isProgress(r) ? "In corso" : "", SHARE_W / 2, y + 52);
+    g.fillText(isWish(r) ? "In wishlist" : isProgress(r) ? "In corso" : "", SHARE_W / 2, y + 44);
   }
-  y += 80 + 110;
+  y += 58 + 52;
 
-  // "su rank★d"
-  g.font = "600 30px Outfit";
-  g.fillStyle = "rgba(255,255,255,0.55)";
-  g.fillText("SU", SHARE_W / 2, y);
-  g.fillRect(SHARE_W / 2 - 200, y - 10, 150, 2);
-  g.fillRect(SHARE_W / 2 + 50, y - 10, 150, 2);
-  y += 40 + 70;
-  g.font = "700 80px Fredoka";
-  const wRank = g.measureText("rank").width, wD = g.measureText("d").width;
-  g.font = "64px 'Segoe UI Symbol', sans-serif";
-  const wStar = g.measureText("★").width + 8;
-  let lx = (SHARE_W - (wRank + wStar + wD)) / 2;
-  g.textAlign = "left";
-  g.font = "700 80px Fredoka"; g.fillStyle = "#fff6f6"; g.fillText("rank", lx, y); lx += wRank + 4;
-  g.font = "64px 'Segoe UI Symbol', sans-serif"; g.fillStyle = "#e0a050"; g.fillText("★", lx, y); lx += wStar - 4;
-  g.font = "700 80px Fredoka"; g.fillStyle = "#fff6f6"; g.fillText("d", lx, y);
+  // Logo vero (logo.png); se manca, il nome in testo
+  if (logo) g.drawImage(logo, (SHARE_W - logoW) / 2, y, logoW, logoH);
+  else { g.font = "600 56px Fredoka"; g.fillStyle = "#fff6f6"; g.fillText("rank★d", SHARE_W / 2, y + 52); }
 
   return new Promise(resolve => c.toBlob(resolve, "image/jpeg", 0.92));
 }
 
 /* ── Anteprima + condivisione ── */
 async function openShare(review) {
+  _shareReview = review;
   const btn = document.getElementById("detail-share-btn");
   btn.disabled = true;
   try {
@@ -203,6 +225,9 @@ async function openShare(review) {
     prev.src = URL.createObjectURL(_shareBlob);
     const file = new File([_shareBlob], _shareName, { type: "image/jpeg" });
     document.getElementById("share-go-btn").classList.toggle("hidden", !(navigator.canShare && navigator.canShare({ files: [file] })));
+    const hasAvatar = !!_getAvatar();
+    document.getElementById("share-avatar-btn").textContent = hasAvatar ? "Cambia avatar" : "+ Aggiungi avatar";
+    document.getElementById("share-avatar-remove").classList.toggle("hidden", !hasAvatar);
     document.getElementById("share-modal").classList.remove("hidden");
   } catch(e) {
     alert("Non sono riuscito a creare l'immagine: " + e.message);
@@ -236,4 +261,19 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("share-go-btn").addEventListener("click", shareGo);
   document.getElementById("share-save-btn").addEventListener("click", shareSave);
   document.getElementById("share-modal").addEventListener("click", e => { if (e.target.id === "share-modal") closeShare(); });
+
+  const fileInput = document.getElementById("share-avatar-file");
+  document.getElementById("share-avatar-btn").addEventListener("click", () => fileInput.click());
+  fileInput.addEventListener("change", async () => {
+    const file = fileInput.files[0];
+    fileInput.value = "";
+    if (!file) return;
+    try { await _setAvatarFromFile(file); }
+    catch(e) { return alert("Avatar non salvato: " + e.message); }
+    if (_shareReview) openShare(_shareReview);   // rigenera con l'avatar
+  });
+  document.getElementById("share-avatar-remove").addEventListener("click", () => {
+    try { localStorage.removeItem(AVATAR_KEY); } catch(e) {}
+    if (_shareReview) openShare(_shareReview);
+  });
 });
