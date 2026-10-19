@@ -6,6 +6,9 @@
 
 let _seasonCtx = null;      // { review, season } della stagione aperta
 const _epTimers = {};
+// Cache di sessione: si scarica una volta, poi si aggiorna sul posto quando voti/scrivi
+const _seriesCache = {};    // id serie → [stagioni]
+const _seasonCache = {};    // "id:stagione" → { episodes, review }
 
 function _fmtAvg(v) { return v > 0 ? v.toFixed(1).replace(".", ",") : "—"; }
 
@@ -17,18 +20,30 @@ async function loadSeasons(review) {
   box.classList.toggle("hidden", !show);
   if (!show) return;
 
+  if (_seriesCache[review.id]) return _renderSeasons(review, _seriesCache[review.id]);
+
   list.innerHTML = '<div class="seasons-empty">Carico le stagioni…</div>';
   try {
     const res = await apiPost("series_get", { id: review.id });
     if (_detailReview !== review) return;            // nel frattempo è stato aperto altro
     if (res.status !== "SUCCESS") throw new Error(res.message || "errore");
     const seasons = res.seasons || [];
-    review._seriesRated = seasons.some(s => s.avg > 0);
     if (!seasons.length) {
+      // Non in cache: se correggi il titolo in Modifica, alla prossima apertura riprova TMDB
       list.innerHTML = `<div class="seasons-empty">${escapeHtml(res.message || "Nessuna stagione trovata")}</div>`;
       return;
     }
-    list.innerHTML = seasons.map(s => `
+    _seriesCache[review.id] = seasons;
+    _renderSeasons(review, seasons);
+  } catch(e) {
+    if (_detailReview === review) list.innerHTML = `<div class="seasons-empty">Stagioni non disponibili: ${escapeHtml(e.message)}</div>`;
+  }
+}
+
+function _renderSeasons(review, seasons) {
+  const list = document.getElementById("detail-seasons-list");
+  review._seriesRated = seasons.some(s => s.avg > 0);
+  list.innerHTML = seasons.map(s => `
       <button type="button" class="season-row" data-season="${s.season}">
         <span class="season-main">
           <span class="season-name">${escapeHtml(s.name || "Stagione " + s.season)}</span>
@@ -37,11 +52,8 @@ async function loadSeasons(review) {
         <span class="season-rate stars">${renderStars(s.avg)}</span>
         <span class="season-avg">${_fmtAvg(s.avg)}</span>
       </button>`).join("");
-    list.querySelectorAll(".season-row").forEach(b => b.addEventListener("click", () =>
-      openSeason(review, parseInt(b.dataset.season, 10), b.querySelector(".season-name").textContent)));
-  } catch(e) {
-    if (_detailReview === review) list.innerHTML = `<div class="seasons-empty">Stagioni non disponibili: ${escapeHtml(e.message)}</div>`;
-  }
+  list.querySelectorAll(".season-row").forEach(b => b.addEventListener("click", () =>
+    openSeason(review, parseInt(b.dataset.season, 10), b.querySelector(".season-name").textContent)));
 }
 
 /* ── Vista stagione ── */
@@ -58,12 +70,20 @@ async function openSeason(review, season, name) {
   document.querySelector("#detail-modal .detail-body").scrollTop = 0;
   if (window.lucide) lucide.createIcons();
 
+  const key = review.id + ":" + season;
+  if (_seasonCache[key]) {
+    _renderSeasonReview(_seasonCache[key].review);
+    _renderEpisodes(_seasonCache[key].episodes);    // stessi oggetti che i voti modificano: la cache resta aggiornata
+    return;
+  }
+
   try {
     const res = await apiPost("season_get", { id: review.id, season });
     if (_seasonCtx !== ctx) return;
     if (res.status !== "SUCCESS") throw new Error(res.message || "errore");
+    _seasonCache[key] = { episodes: res.episodes || [], review: res.review };
     _renderSeasonReview(res.review);
-    _renderEpisodes(res.episodes || []);
+    _renderEpisodes(_seasonCache[key].episodes);
   } catch(e) {
     if (_seasonCtx === ctx) document.getElementById("season-episodes").innerHTML =
       `<div class="seasons-empty">Puntate non disponibili: ${escapeHtml(e.message)}</div>`;
@@ -71,10 +91,17 @@ async function openSeason(review, season, name) {
 }
 
 function closeSeason() {
+  const ctx = _seasonCtx;
   _seasonCtx = null;
+  // Riporta media e conteggi della stagione nell'elenco, senza richiederlo al backend
+  const s = ctx && (_seriesCache[ctx.review.id] || []).find(x => x.season === ctx.season);
+  if (s && ctx.eps.length) {
+    s.avg   = _localAvg(ctx.eps);
+    s.rated = ctx.eps.filter(e => e.rating > 0).length;
+  }
   document.getElementById("detail-season").classList.add("hidden");
   document.getElementById("detail-view").classList.remove("hidden");
-  if (_detailReview) loadSeasons(_detailReview);     // medie aggiornate
+  if (_detailReview) loadSeasons(_detailReview);
 }
 
 function _setSeasonAvg(v) {
@@ -124,6 +151,10 @@ function _seasonWriteForm(rev) {
     try {
       const res = await apiPost("season_review", { id: ctx.review.id, season: ctx.season, text });
       if (res.status !== "SUCCESS") throw new Error(res.message || "errore");
+      const cached = _seasonCache[ctx.review.id + ":" + ctx.season];
+      if (cached) cached.review = res.review;
+      const s = (_seriesCache[ctx.review.id] || []).find(x => x.season === ctx.season);
+      if (s) s.reviewed = true;
       if (_seasonCtx === ctx) _renderSeasonReview(res.review);
     } catch(e) {
       alert("Recensione della stagione non salvata: " + e.message);   // il testo resta nel box
