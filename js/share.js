@@ -132,7 +132,7 @@ async function renderShareImage(r) {
   g.fillRect(0, 0, SHARE_W, SHARE_H);
 
   // Misure, per centrare il blocco in verticale
-  const AV = avatar ? 112 : 0;                       // l'avatar sta a cavallo del bordo alto del poster
+  const AV = avatar ? 150 : 0;                      // l'avatar sta a cavallo del bordo alto del poster
   let pw, ph;
   if (img) {
     const s = Math.min(900 / img.width, 760 / img.height);   // giochi orizzontali: interi, senza ritaglio
@@ -146,7 +146,7 @@ async function renderShareImage(r) {
                + (year && !parent ? " · " + year : "");
   const rated = !isWish(r) && !isProgress(r) && r.rating > 0;
   const logoH = 84, logoW = logo ? logo.width * logoH / logo.height : 0;
-  const blockH = AV / 2 + ph + 44 + 34 + titleLines.length * 74 + 24 + 58 + 52 + logoH;
+  const blockH = AV / 2 + ph + 44 + 34 + titleLines.length * 74 + 24 + 58 + 56 + 26 + 30 + logoH;
   let y = Math.max(40, (SHARE_H - blockH) / 2) + AV / 2;
 
   // Poster
@@ -202,7 +202,18 @@ async function renderShareImage(r) {
     g.fillStyle = tok.accent;
     g.fillText(isWish(r) ? "In wishlist" : isProgress(r) ? "In corso" : "", SHARE_W / 2, y + 44);
   }
-  y += 58 + 52;
+  y += 58 + 56;
+
+  // "— RECENSITO SU —" (wishlist / in corso: "IN LISTA SU")
+  const by = rated || (!isWish(r) && !isProgress(r)) ? "RECENSITO SU" : "IN LISTA SU";
+  g.font = "600 26px Outfit";
+  g.fillStyle = "rgba(255,255,255,0.55)";
+  g.textAlign = "center";
+  g.fillText(by, SHARE_W / 2, y + 20);
+  const half = g.measureText(by).width / 2 + 22;
+  g.fillRect(SHARE_W / 2 - half - 130, y + 10, 130, 2);
+  g.fillRect(SHARE_W / 2 + half, y + 10, 130, 2);
+  y += 26 + 30;
 
   // Logo vero (logo.png); se manca, il nome in testo
   if (logo) g.drawImage(logo, (SHARE_W - logoW) / 2, y, logoW, logoH);
